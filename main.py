@@ -64,14 +64,16 @@ class LoginResponse(BaseModel):
 @app.post("/register/", response_model=RegisterResponse)
 def register(request: RegisterRequest, db: Session = Depends(get_db)):
     try:
-        if len(request.password) > 70:
-            raise HTTPException(status_code=400, detail="Password too long")
+        print(f"[REGISTER] Received username: {request.username}, password length: {len(request.password)}")
 
         existing_user = db.query(User).filter(User.username == request.username).first()
         if existing_user:
             raise HTTPException(status_code=400, detail="Username already exists")
 
-        hashed_password = pwd_context.hash(request.password)
+        safe_password = request.password.encode('utf-8')[:72].decode('utf-8', 'ignore')
+        print(f"[REGISTER] Password after truncation: {len(safe_password)} bytes")
+
+        hashed_password = pwd_context.hash(safe_password)
         new_user = User(
             username=request.username,
             password=hashed_password
@@ -93,11 +95,15 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
 @app.post("/login/", response_model=LoginResponse)
 def login(request: LoginRequest, db: Session = Depends(get_db)):
     try:
+        print(f"[LOGIN] Received username: {request.username}, password length: {len(request.password)}")
+
         user = db.query(User).filter(User.username == request.username).first()
         if not user:
             raise HTTPException(status_code=401, detail="Invalid username or password")
 
-        if not pwd_context.verify(request.password, user.password):
+        safe_password = request.password.encode('utf-8')[:72].decode('utf-8', 'ignore')
+        
+        if not pwd_context.verify(safe_password, user.password):
             raise HTTPException(status_code=401, detail="Invalid username or password")
 
         return LoginResponse(

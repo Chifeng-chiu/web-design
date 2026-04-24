@@ -13,7 +13,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True, nullable=False)
-    password = Column(String, nullable=False)
+    password = Column(String(500), nullable=False)
 
     trade_records = relationship("TradeRecord", back_populates="user")
     posts = relationship("Post", back_populates="user")
