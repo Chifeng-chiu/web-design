@@ -389,10 +389,6 @@
                 <p id="authSubtitle">請輸入您的帳號密碼</p>
             </div>
             <form class="auth-form" id="authForm">
-                <div class="form-group" id="emailGroup">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" placeholder="請輸入 Email">
-                </div>
                 <div class="form-group">
                     <label for="username">帳號</label>
                     <input type="text" id="username" placeholder="請輸入帳號" required>
@@ -538,7 +534,6 @@
 
         function toggleAuthMode() {
             isRegisterMode = !isRegisterMode;
-            const emailGroup = document.getElementById('emailGroup');
             const authTitle = document.getElementById('authTitle');
             const authSubtitle = document.getElementById('authSubtitle');
             const authBtn = document.getElementById('authBtn');
@@ -546,14 +541,12 @@
             const authToggleLink = document.getElementById('authToggleLink');
 
             if (isRegisterMode) {
-                emailGroup.style.display = 'block';
                 authTitle.textContent = '註冊會員';
                 authSubtitle.textContent = '建立新帳號開始使用';
                 authBtn.textContent = '註冊';
                 authToggleText.textContent = '已有帳號？';
                 authToggleLink.textContent = '立即登入';
             } else {
-                emailGroup.style.display = 'none';
                 authTitle.textContent = '登入會員';
                 authSubtitle.textContent = '請輸入您的帳號密碼';
                 authBtn.textContent = '登入';
@@ -568,7 +561,6 @@
             e.preventDefault();
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            const email = document.getElementById('email').value;
             const authBtn = document.getElementById('authBtn');
 
             authBtn.disabled = true;
@@ -579,7 +571,7 @@
                     const response = await fetch(`${API_BASE}/register/`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username, email, password })
+                        body: JSON.stringify({ username, password })
                     });
 
                     if (!response.ok) {

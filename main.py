@@ -47,13 +47,11 @@ def startup_event():
 
 class RegisterRequest(BaseModel):
     username: str
-    email: str
     password: str
 
 class RegisterResponse(BaseModel):
     id: int
     username: str
-    email: str
 
 class LoginRequest(BaseModel):
     username: str
@@ -66,16 +64,16 @@ class LoginResponse(BaseModel):
 @app.post("/register/", response_model=RegisterResponse)
 def register(request: RegisterRequest, db: Session = Depends(get_db)):
     try:
-        existing_user = db.query(User).filter(
-            (User.username == request.username) | (User.email == request.email)
-        ).first()
+        if len(request.password) > 70:
+            raise HTTPException(status_code=400, detail="Password too long")
+
+        existing_user = db.query(User).filter(User.username == request.username).first()
         if existing_user:
-            raise HTTPException(status_code=400, detail="Username or email already exists")
+            raise HTTPException(status_code=400, detail="Username already exists")
 
         hashed_password = pwd_context.hash(request.password)
         new_user = User(
             username=request.username,
-            email=request.email,
             password=hashed_password
         )
         db.add(new_user)
@@ -84,8 +82,7 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
 
         return RegisterResponse(
             id=new_user.id,
-            username=new_user.username,
-            email=new_user.email
+            username=new_user.username
         )
     except HTTPException:
         raise
