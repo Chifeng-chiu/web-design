@@ -3,12 +3,15 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
+from passlib.context import CryptContext
 
 from database import SessionLocal, get_db, create_tables
 from models import TradeRecord, User, TradeType, Post
 import yfinance
 
 app = FastAPI(title="Stock Trading API")
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 app.add_middleware(
     CORSMiddleware,
@@ -41,6 +44,73 @@ class TradeResponse(BaseModel):
 @app.on_event("startup")
 def startup_event():
     create_tables()
+
+class RegisterRequest(BaseModel):
+    username: str
+    email: str
+    password: str
+
+class RegisterResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+class LoginResponse(BaseModel):
+    user_id: int
+    username: str
+
+@app.post("/register/", response_model=RegisterResponse)
+def register(request: RegisterRequest, db: Session = Depends(get_db)):
+    try:
+        existing_user = db.query(User).filter(
+            (User.username == request.username) | (User.email == request.email)
+        ).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Username or email already exists")
+
+        hashed_password = pwd_context.hash(request.password)
+        new_user = User(
+            username=request.username,
+            email=request.email,
+            password=hashed_password
+        )
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+
+        return RegisterResponse(
+            id=new_user.id,
+            username=new_user.username,
+            email=new_user.email
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/login/", response_model=LoginResponse)
+def login(request: LoginRequest, db: Session = Depends(get_db)):
+    try:
+        user = db.query(User).filter(User.username == request.username).first()
+        if not user:
+            raise HTTPException(status_code=401, detail="Invalid username or password")
+
+        if not pwd_context.verify(request.password, user.password):
+            raise HTTPException(status_code=401, detail="Invalid username or password")
+
+        return LoginResponse(
+            user_id=user.id,
+            username=user.username
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/trades/", response_model=TradeResponse)
 def create_trade(trade: TradeCreate, db: Session = Depends(get_db)):
