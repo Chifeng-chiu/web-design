@@ -13,18 +13,19 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: #f5f7fa;
-            color: #333;
+            background: #fafafa;
+            color: #262626;
             line-height: 1.6;
         }
 
+        /* Auth overlay */
         .auth-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            background: linear-gradient(135deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -40,195 +41,357 @@
 
         .auth-card {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border: 1px solid #dbdbdb;
+            border-radius: 1px;
             width: 100%;
-            max-width: 400px;
-            padding: 2.5rem;
+            max-width: 350px;
+            padding: 2rem 2.5rem;
             animation: slideUp 0.5s ease;
         }
 
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .auth-header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .auth-header h2 {
-            color: #2c3e50;
-            font-size: 1.75rem;
+            font-family: 'Segoe Script', 'Dancing Script', cursive;
+            font-size: 2rem;
+            color: #262626;
             margin-bottom: 0.5rem;
         }
 
         .auth-header p {
-            color: #888;
-            font-size: 0.95rem;
+            color: #8e8e8e;
+            font-size: 0.875rem;
         }
 
         .auth-form .form-group {
-            margin-bottom: 1.25rem;
+            margin-bottom: 0.75rem;
         }
 
         .auth-form label {
-            display: block;
-            font-size: 0.875rem;
-            color: #555;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
+            display: none;
         }
 
         .auth-form input {
             width: 100%;
-            padding: 0.875rem 1rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            padding: 0.75rem 0.875rem;
+            background: #fafafa;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
         }
 
         .auth-form input:focus {
             outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            border-color: #a8a8a8;
         }
 
         .auth-btn {
             width: 100%;
-            padding: 1rem;
-            background: #3498db;
+            padding: 0.75rem;
+            background: #0095f6;
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 0.875rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
+            transition: background 0.2s;
+            margin-top: 0.75rem;
         }
 
         .auth-btn:hover {
-            background: #2980b9;
-        }
-
-        .auth-btn:active {
-            transform: scale(0.98);
+            background: #1877f2;
         }
 
         .auth-btn:disabled {
-            background: #b0bec5;
+            background: #b2dffc;
             cursor: not-allowed;
         }
 
         .auth-footer {
             text-align: center;
-            margin-top: 1.5rem;
-            color: #666;
-            font-size: 0.9rem;
+            margin-top: 1.25rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid #dbdbdb;
+            color: #262626;
+            font-size: 0.875rem;
         }
 
         .auth-footer a {
-            color: #3498db;
+            color: #0095f6;
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
         }
 
-        .auth-footer a:hover {
-            text-decoration: underline;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .user-info .username {
-            font-weight: 500;
-        }
-
-        .logout-btn {
-            padding: 0.5rem 1rem;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .logout-btn:hover {
-            background: #c0392b;
-        }
-
+        /* Header / Navbar */
         .header {
-            background: #2c3e50;
-            color: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 1px solid #dbdbdb;
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .header-content {
+            width: 100%;
+            max-width: 935px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .header h1 {
+            font-family: 'Segoe Script', 'Dancing Script', cursive;
             font-size: 1.5rem;
+            font-weight: 400;
+            color: #262626;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-info .username {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .logout-btn {
+            padding: 0.4rem 0.75rem;
+            background: transparent;
+            color: #0095f6;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #fafafa;
+        }
+
+        /* Main feed container */
+        .feed {
+            max-width: 470px;
+            margin: 0 auto;
+            padding: 5rem 0 2rem;
+        }
+
+        /* Tab navigation */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #dbdbdb;
+            background: white;
+            margin-bottom: 1.5rem;
+            position: sticky;
+            top: 3.5rem;
+            z-index: 50;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #8e8e8e;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .tab.active {
+            color: #262626;
+            border-bottom-color: #262626;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* IG-style cards */
+        .card {
+            background: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Post header (like IG story header) */
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid #efefef;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.75rem;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .post-header-info {
+            flex: 1;
+        }
+
+        .post-header-username {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .post-header-time {
+            font-size: 0.75rem;
+            color: #8e8e8e;
+        }
+
+        /* Post body */
+        .post-body {
+            padding: 1rem;
+        }
+
+        .post-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 0.5rem;
+        }
+
+        .post-content {
+            color: #262626;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Action buttons (like IG) */
+        .post-actions {
+            display: flex;
+            gap: 1rem;
+            padding: 0.5rem 1rem;
+            border-top: 1px solid #efefef;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.25rem;
+            color: #262626;
+            transition: opacity 0.2s;
+        }
+
+        .action-btn:hover {
+            opacity: 0.6;
+        }
+
+        .action-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Trade card specific */
+        .trade-card {
+            padding: 1rem;
+        }
+
+        .trade-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.625rem 0;
+            border-bottom: 1px solid #efefef;
+            font-size: 0.875rem;
+        }
+
+        .trade-row:last-child {
+            border-bottom: none;
+        }
+
+        .trade-label {
+            color: #8e8e8e;
+        }
+
+        .trade-value {
             font-weight: 600;
         }
 
-        .container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            padding: 1.5rem;
-            max-width: 1400px;
-            margin: 0 auto;
+        .trade-buy {
+            color: #00a862;
         }
 
-        @media (max-width: 900px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
+        .trade-sell {
+            color: #ed4956;
         }
 
-        .card {
+        /* Forms */
+        .create-card {
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            overflow: hidden;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
         }
 
-        .card-header {
-            background: #34495e;
-            color: white;
-            padding: 1rem 1.25rem;
-            font-size: 1.1rem;
-            font-weight: 500;
+        .create-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #efefef;
+            margin-bottom: 0.75rem;
         }
 
-        .card-body {
-            padding: 1.25rem;
+        .create-card-header .avatar {
+            width: 28px;
+            height: 28px;
+            font-size: 0.65rem;
+        }
+
+        .create-card-header span {
+            font-weight: 600;
+            font-size: 0.875rem;
         }
 
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
         }
 
         .form-group label {
-            display: block;
-            font-size: 0.875rem;
-            color: #555;
-            margin-bottom: 0.375rem;
+            display: none;
         }
 
         .form-group input,
@@ -236,9 +399,10 @@
         .form-group textarea {
             width: 100%;
             padding: 0.625rem 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 0.95rem;
+            background: #fafafa;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+            font-size: 0.875rem;
             transition: border-color 0.2s;
         }
 
@@ -246,138 +410,74 @@
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #3498db;
-        }
-
-        .form-group input:disabled {
-            background: #f5f5f5;
-            color: #888;
+            border-color: #a8a8a8;
         }
 
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+            gap: 0.5rem;
         }
 
         .btn {
-            display: inline-block;
-            padding: 0.625rem 1.25rem;
-            background: #3498db;
+            display: block;
+            width: 100%;
+            padding: 0.625rem;
+            background: #0095f6;
             color: white;
             border: none;
-            border-radius: 6px;
-            font-size: 0.95rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
             cursor: pointer;
             transition: background 0.2s;
         }
 
         .btn:hover {
-            background: #2980b9;
-        }
-
-        .btn-block {
-            width: 100%;
-        }
-
-        .table-wrapper {
-            margin-top: 1.25rem;
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        th, td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-
-        th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #555;
-        }
-
-        tr:hover {
-            background: #fafafa;
-        }
-
-        .trade-buy {
-            color: #27ae60;
-            font-weight: 500;
-        }
-
-        .trade-sell {
-            color: #e74c3c;
-            font-weight: 500;
-        }
-
-        .post-item {
-            padding: 1rem;
-            border: 1px solid #eee;
-            border-radius: 6px;
-            margin-bottom: 0.75rem;
-        }
-
-        .post-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .post-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 0.25rem;
-        }
-
-        .post-meta {
-            font-size: 0.8rem;
-            color: #888;
-            margin-bottom: 0.5rem;
-        }
-
-        .post-content {
-            color: #555;
-            font-size: 0.95rem;
+            background: #1877f2;
         }
 
         .empty-state {
             text-align: center;
             padding: 2rem;
-            color: #888;
+            color: #8e8e8e;
+            font-size: 0.875rem;
         }
 
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 1.5rem;
-            right: 1.5rem;
-            background: #2c3e50;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #262626;
             color: white;
             padding: 0.75rem 1.25rem;
-            border-radius: 6px;
+            border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transform: translateY(100px);
             opacity: 0;
             transition: all 0.3s;
             z-index: 2000;
+            font-size: 0.875rem;
         }
 
         .toast.show {
-            transform: translateY(0);
+            transform: translateX(-50%) translateY(0);
             opacity: 1;
         }
 
         .toast.error {
-            background: #e74c3c;
+            background: #ed4956;
         }
 
         .toast.success {
-            background: #27ae60;
+            background: #00a862;
+        }
+
+        @media (max-width: 480px) {
+            .feed {
+                padding: 4.5rem 0.5rem 1rem;
+            }
         }
     </style>
 </head>
@@ -407,17 +507,52 @@
     </div>
 
     <header class="header">
-        <h1>股票交易與論壇 Dashboard</h1>
-        <div class="user-info" id="userInfo" style="display: none;">
-            <span class="username" id="displayUsername"></span>
-            <button class="logout-btn" id="logoutBtn">登出</button>
+        <div class="header-content">
+            <h1>股票交易與論壇</h1>
+            <div class="user-info" id="userInfo" style="display: none;">
+                <span class="username" id="displayUsername"></span>
+                <button class="logout-btn" id="logoutBtn">登出</button>
+            </div>
         </div>
     </header>
 
-    <div class="container">
-        <div class="card">
-            <div class="card-header">我的交易紀錄</div>
-            <div class="card-body">
+    <div class="feed">
+        <div class="tabs">
+            <div class="tab active" data-tab="forum">論壇</div>
+            <div class="tab" data-tab="trades">交易紀錄</div>
+        </div>
+
+        <!-- Forum tab -->
+        <div class="tab-content active" id="forumTab">
+            <div class="create-card">
+                <div class="create-card-header">
+                    <div class="avatar" id="createPostAvatar"></div>
+                    <span>發布新文章</span>
+                </div>
+                <form id="postForm">
+                    <div class="form-group" style="display: none;">
+                        <label for="postUserId">使用者 ID</label>
+                        <input type="number" id="postUserId">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="title" required placeholder="標題...">
+                    </div>
+                    <div class="form-group">
+                        <textarea id="content" rows="3" required placeholder="分享你的投資心得..."></textarea>
+                    </div>
+                    <button type="submit" class="btn">發布</button>
+                </form>
+            </div>
+            <div id="postsList"></div>
+        </div>
+
+        <!-- Trades tab -->
+        <div class="tab-content" id="tradesTab">
+            <div class="create-card">
+                <div class="create-card-header">
+                    <div class="avatar" id="createTradeAvatar"></div>
+                    <span>新增交易</span>
+                </div>
                 <form id="tradeForm">
                     <div class="form-group" style="display: none;">
                         <label for="userId">使用者 ID</label>
@@ -425,11 +560,9 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="stockSymbol">股票代號</label>
-                            <input type="text" id="stockSymbol" required placeholder="例如: 0050">
+                            <input type="text" id="stockSymbol" required placeholder="股票代號 (如: 0050)">
                         </div>
                         <div class="form-group">
-                            <label for="tradeType">買賣</label>
                             <select id="tradeType" required>
                                 <option value="buy">買入</option>
                                 <option value="sell">賣出</option>
@@ -438,58 +571,16 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="price">成交價</label>
-                            <input type="number" id="price" required min="0" step="0.01" placeholder="0.00">
+                            <input type="number" id="price" required min="0" step="0.01" placeholder="成交價">
                         </div>
                         <div class="form-group">
-                            <label for="quantity">股數</label>
-                            <input type="number" id="quantity" required min="1" placeholder="100">
+                            <input type="number" id="quantity" required min="1" placeholder="股數">
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-block">送出交易</button>
+                    <button type="submit" class="btn">送出交易</button>
                 </form>
-
-                <div class="table-wrapper">
-                    <table id="tradeTable">
-                        <thead>
-                            <tr>
-                                <th>股票</th>
-                                <th>類型</th>
-                                <th>價格</th>
-                                <th>股數</th>
-                                <th>日期</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tradeTableBody">
-                        </tbody>
-                    </table>
-                </div>
             </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">股票論壇</div>
-            <div class="card-body">
-                <form id="postForm">
-                    <div class="form-group" style="display: none;">
-                        <label for="postUserId">使用者 ID</label>
-                        <input type="number" id="postUserId">
-                    </div>
-                    <div class="form-group">
-                        <label for="title">標題</label>
-                        <input type="text" id="title" required placeholder="文章標題">
-                    </div>
-                    <div class="form-group">
-                        <label for="content">內容</label>
-                        <textarea id="content" rows="3" required placeholder="分享你的投資心得..."></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-block">發布文章</button>
-                </form>
-
-                <div class="table-wrapper">
-                    <div id="postsList"></div>
-                </div>
-            </div>
+            <div id="tradesList"></div>
         </div>
     </div>
 
@@ -516,6 +607,21 @@
             return localStorage.getItem('username') || '';
         }
 
+        function getInitial() {
+            return getUsername().charAt(0).toUpperCase();
+        }
+
+        function timeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            if (seconds < 60) return '剛剛';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes} 分鐘前`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours} 小時前`;
+            const days = Math.floor(hours / 24);
+            return `${days} 天前`;
+        }
+
         function checkAuth() {
             const userId = getUserId();
             if (userId) {
@@ -524,6 +630,8 @@
                 document.getElementById('displayUsername').textContent = getUsername();
                 document.getElementById('userId').value = userId;
                 document.getElementById('postUserId').value = userId;
+                document.getElementById('createPostAvatar').textContent = getInitial();
+                document.getElementById('createTradeAvatar').textContent = getInitial();
                 loadTrades();
                 loadPosts();
             } else {
@@ -554,6 +662,16 @@
                 authToggleLink.textContent = '立即註冊';
             }
         }
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab + 'Tab').classList.add('active');
+            });
+        });
 
         document.getElementById('authToggleLink').addEventListener('click', toggleAuthMode);
 
@@ -612,7 +730,7 @@
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
             document.getElementById('authForm').reset();
-            document.getElementById('tradeTableBody').innerHTML = '';
+            document.getElementById('tradesList').innerHTML = '';
             document.getElementById('postsList').innerHTML = '';
             showToast('已登出', 'info');
             checkAuth();
@@ -628,20 +746,54 @@
                 if (!response.ok) throw new Error('載入失敗');
                 const trades = await response.json();
 
-                const tbody = document.getElementById('tradeTableBody');
+                const container = document.getElementById('tradesList');
                 if (trades.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">尚無交易紀錄</td></tr>';
+                    container.innerHTML = '<div class="empty-state">尚無交易紀錄</div>';
                     return;
                 }
 
-                tbody.innerHTML = trades.map(trade => `
-                    <tr>
-                        <td><strong>${trade.stock_symbol}</strong></td>
-                        <td class="trade-${trade.trade_type}">${trade.trade_type === 'buy' ? '買入' : '賣出'}</td>
-                        <td>${trade.price.toFixed(2)}</td>
-                        <td>${trade.quantity}</td>
-                        <td>${new Date(trade.trade_date).toLocaleDateString('zh-TW')}</td>
-                    </tr>
+                container.innerHTML = trades.map(trade => `
+                    <div class="card">
+                        <div class="post-header">
+                            <div class="avatar">${getInitial()}</div>
+                            <div class="post-header-info">
+                                <div class="post-header-username">${getUsername()}</div>
+                                <div class="post-header-time">${trade.stock_symbol}</div>
+                            </div>
+                            <span class="trade-${trade.trade_type}" style="font-weight: 600; font-size: 0.875rem;">
+                                ${trade.trade_type === 'buy' ? '買入' : '賣出'}
+                            </span>
+                        </div>
+                        <div class="trade-card">
+                            <div class="trade-row">
+                                <span class="trade-label">成交價</span>
+                                <span class="trade-value">${trade.price.toFixed(2)}</span>
+                            </div>
+                            <div class="trade-row">
+                                <span class="trade-label">股數</span>
+                                <span class="trade-value">${trade.quantity}</span>
+                            </div>
+                            <div class="trade-row">
+                                <span class="trade-label">總金額</span>
+                                <span class="trade-value">${(trade.price * trade.quantity).toFixed(2)}</span>
+                            </div>
+                            <div class="trade-row">
+                                <span class="trade-label">日期</span>
+                                <span class="trade-value">${new Date(trade.trade_date).toLocaleDateString('zh-TW')}</span>
+                            </div>
+                        </div>
+                        <div class="post-actions">
+                            <button class="action-btn">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                            </button>
+                            <button class="action-btn">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                            </button>
+                            <button class="action-btn" style="margin-left: auto;">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg>
+                            </button>
+                        </div>
+                    </div>
                 `).join('');
             } catch (error) {
                 console.error('Error loading trades:', error);
@@ -661,10 +813,29 @@
                 }
 
                 container.innerHTML = posts.map(post => `
-                    <div class="post-item">
-                        <div class="post-title">${post.title}</div>
-                        <div class="post-meta">${post.username} · ${new Date(post.created_at).toLocaleString('zh-TW')}</div>
-                        <div class="post-content">${post.content}</div>
+                    <div class="card">
+                        <div class="post-header">
+                            <div class="avatar">${post.username.charAt(0).toUpperCase()}</div>
+                            <div class="post-header-info">
+                                <div class="post-header-username">${post.username}</div>
+                                <div class="post-header-time">${timeAgo(new Date(post.created_at))}</div>
+                            </div>
+                        </div>
+                        <div class="post-body">
+                            <div class="post-title">${post.title}</div>
+                            <div class="post-content">${post.content}</div>
+                        </div>
+                        <div class="post-actions">
+                            <button class="action-btn">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                            </button>
+                            <button class="action-btn">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                            </button>
+                            <button class="action-btn" style="margin-left: auto;">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg>
+                            </button>
+                        </div>
                     </div>
                 `).join('');
             } catch (error) {
