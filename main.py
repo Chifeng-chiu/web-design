@@ -14,7 +14,7 @@ import yfinance
 pwd_context = CryptContext(
     schemes=["bcrypt"],
     deprecated="auto",
-    bcrypt__truncate_error=False   # 關閉 passlib 的 72 bytes 長度檢查
+    bcrypt__truncate_error=False
 )
 
 # 修正 2：改用 lifespan 取代棄用的 @app.on_event("startup")
@@ -85,7 +85,7 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
         if existing_user:
             raise HTTPException(status_code=400, detail="Username already exists")
 
-        safe_password = safe_encode_password(request.password)
+        safe_password = request.password
         hashed_password = pwd_context.hash(safe_password)
 
         new_user = User(username=request.username, password=hashed_password)
