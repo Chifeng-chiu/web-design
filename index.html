@@ -1,907 +1,893 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>股票交易與論壇</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: #fafafa;
-            color: #262626;
-            line-height: 1.6;
-        }
-
-        /* Auth overlay */
-        .auth-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            transition: opacity 0.5s, visibility 0.5s;
-        }
-
-        .auth-overlay.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        .auth-card {
-            background: white;
-            border: 1px solid #dbdbdb;
-            border-radius: 1px;
-            width: 100%;
-            max-width: 350px;
-            padding: 2rem 2.5rem;
-            animation: slideUp 0.5s ease;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .auth-header h2 {
-            font-family: 'Segoe Script', 'Dancing Script', cursive;
-            font-size: 2rem;
-            color: #262626;
-            margin-bottom: 0.5rem;
-        }
-
-        .auth-header p {
-            color: #8e8e8e;
-            font-size: 0.875rem;
-        }
-
-        .auth-form .form-group {
-            margin-bottom: 0.75rem;
-        }
-
-        .auth-form label {
-            display: none;
-        }
-
-        .auth-form input {
-            width: 100%;
-            padding: 0.75rem 0.875rem;
-            background: #fafafa;
-            border: 1px solid #dbdbdb;
-            border-radius: 3px;
-            font-size: 0.875rem;
-            transition: border-color 0.2s;
-        }
-
-        .auth-form input:focus {
-            outline: none;
-            border-color: #a8a8a8;
-        }
-
-        .auth-btn {
-            width: 100%;
-            padding: 0.75rem;
-            background: #0095f6;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 0.75rem;
-        }
-
-        .auth-btn:hover {
-            background: #1877f2;
-        }
-
-        .auth-btn:disabled {
-            background: #b2dffc;
-            cursor: not-allowed;
-        }
-
-        .auth-footer {
-            text-align: center;
-            margin-top: 1.25rem;
-            padding-top: 1.25rem;
-            border-top: 1px solid #dbdbdb;
-            color: #262626;
-            font-size: 0.875rem;
-        }
-
-        .auth-footer a {
-            color: #0095f6;
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        /* Header / Navbar */
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            border-bottom: 1px solid #dbdbdb;
-            padding: 0.75rem 1rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-
-        .header-content {
-            width: 100%;
-            max-width: 935px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header h1 {
-            font-family: 'Segoe Script', 'Dancing Script', cursive;
-            font-size: 1.5rem;
-            font-weight: 400;
-            color: #262626;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .user-info .username {
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-
-        .logout-btn {
-            padding: 0.4rem 0.75rem;
-            background: transparent;
-            color: #0095f6;
-            border: 1px solid #dbdbdb;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .logout-btn:hover {
-            background: #fafafa;
-        }
-
-        /* Main feed container */
-        .feed {
-            max-width: 470px;
-            margin: 0 auto;
-            padding: 5rem 0 2rem;
-        }
-
-        /* Tab navigation */
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid #dbdbdb;
-            background: white;
-            margin-bottom: 1.5rem;
-            position: sticky;
-            top: 3.5rem;
-            z-index: 50;
-        }
-
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 1rem;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #8e8e8e;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: color 0.2s, border-color 0.2s;
-        }
-
-        .tab.active {
-            color: #262626;
-            border-bottom-color: #262626;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* IG-style cards */
-        .card {
-            background: white;
-            border: 1px solid #dbdbdb;
-            border-radius: 3px;
-            margin-bottom: 1.5rem;
-        }
-
-        /* Post header (like IG story header) */
-        .post-header {
-            display: flex;
-            align-items: center;
-            padding: 0.875rem 1rem;
-            border-bottom: 1px solid #efefef;
-        }
-
-        .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 0.75rem;
-            margin-right: 0.75rem;
-            flex-shrink: 0;
-        }
-
-        .post-header-info {
-            flex: 1;
-        }
-
-        .post-header-username {
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-
-        .post-header-time {
-            font-size: 0.75rem;
-            color: #8e8e8e;
-        }
-
-        /* Post body */
-        .post-body {
-            padding: 1rem;
-        }
-
-        .post-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #262626;
-            margin-bottom: 0.5rem;
-        }
-
-        .post-content {
-            color: #262626;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        /* Action buttons (like IG) */
-        .post-actions {
-            display: flex;
-            gap: 1rem;
-            padding: 0.5rem 1rem;
-            border-top: 1px solid #efefef;
-        }
-
-        .action-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0.25rem;
-            color: #262626;
-            transition: opacity 0.2s;
-        }
-
-        .action-btn:hover {
-            opacity: 0.6;
-        }
-
-        .action-btn svg {
-            width: 24px;
-            height: 24px;
-        }
-
-        /* Trade card specific */
-        .trade-card {
-            padding: 1rem;
-        }
-
-        .trade-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.625rem 0;
-            border-bottom: 1px solid #efefef;
-            font-size: 0.875rem;
-        }
-
-        .trade-row:last-child {
-            border-bottom: none;
-        }
-
-        .trade-label {
-            color: #8e8e8e;
-        }
-
-        .trade-value {
-            font-weight: 600;
-        }
-
-        .trade-buy {
-            color: #00a862;
-        }
-
-        .trade-sell {
-            color: #ed4956;
-        }
-
-        /* Forms */
-        .create-card {
-            background: white;
-            border: 1px solid #dbdbdb;
-            border-radius: 3px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .create-card-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid #efefef;
-            margin-bottom: 0.75rem;
-        }
-
-        .create-card-header .avatar {
-            width: 28px;
-            height: 28px;
-            font-size: 0.65rem;
-        }
-
-        .create-card-header span {
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-
-        .form-group {
-            margin-bottom: 0.75rem;
-        }
-
-        .form-group label {
-            display: none;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.625rem 0.75rem;
-            background: #fafafa;
-            border: 1px solid #dbdbdb;
-            border-radius: 3px;
-            font-size: 0.875rem;
-            transition: border-color 0.2s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #a8a8a8;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-        }
-
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 0.625rem;
-            background: #0095f6;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn:hover {
-            background: #1877f2;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 2rem;
-            color: #8e8e8e;
-            font-size: 0.875rem;
-        }
-
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 1.5rem;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #262626;
-            color: white;
-            padding: 0.75rem 1.25rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            opacity: 0;
-            transition: all 0.3s;
-            z-index: 2000;
-            font-size: 0.875rem;
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        .toast.error {
-            background: #ed4956;
-        }
-
-        .toast.success {
-            background: #00a862;
-        }
-
-        @media (max-width: 480px) {
-            .feed {
-                padding: 4.5rem 0.5rem 1rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StockBoard · 股票交易論壇</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --brand: #1a73e8;
+      --brand-light: #e8f0fe;
+      --topbar-h: 56px;
+      --bg: #f0f2f5;
+      --card-bg: #ffffff;
+      --text: #1c1e21;
+      --text-sub: #65676b;
+      --border: #e4e6eb;
+      --green: #1b9e4b;
+      --red: #e53935;
+      --radius: 10px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Auth Overlay ─────────────────────────────── */
+    .auth-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 2000;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+    .auth-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    .auth-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+      width: 100%; max-width: 420px;
+      padding: 2.5rem 2.5rem 2rem;
+      animation: authIn 0.35s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes authIn {
+      from { opacity: 0; transform: scale(0.92) translateY(20px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .auth-logo {
+      display: flex; align-items: center; gap: 0.5rem;
+      margin-bottom: 1.75rem;
+    }
+    .auth-logo .logo-icon {
+      width: 36px; height: 36px;
+      background: var(--brand);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 1.1rem;
+    }
+    .auth-logo .logo-text { font-size: 1.2rem; font-weight: 700; color: var(--text); }
+
+    .auth-card h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.375rem; }
+    .auth-card .auth-sub { color: var(--text-sub); font-size: 0.9rem; margin-bottom: 1.75rem; }
+
+    .auth-field { margin-bottom: 1.1rem; }
+    .auth-field label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-sub); margin-bottom: 0.4rem; letter-spacing: 0.03em; text-transform: uppercase; }
+    .auth-field input {
+      width: 100%; padding: 0.8rem 1rem;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: 0.95rem; font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: #fafafa;
+    }
+    .auth-field input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(26,115,232,0.12); background: white; }
+
+    .auth-submit {
+      width: 100%; padding: 0.875rem;
+      background: var(--brand); color: white;
+      border: none; border-radius: 8px;
+      font-size: 1rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: background 0.2s, transform 0.1s;
+      margin-top: 0.5rem;
+    }
+    .auth-submit:hover   { background: #1557b0; }
+    .auth-submit:active  { transform: scale(0.98); }
+    .auth-submit:disabled { background: #b0bec5; cursor: not-allowed; }
+
+    .wakeup-hint {
+      display: none; margin-top: 1rem;
+      padding: 0.75rem 1rem; background: #fff8e1;
+      border: 1px solid #ffe082; border-radius: 8px;
+      font-size: 0.84rem; color: #7a5c00; text-align: center;
+    }
+    .wakeup-hint .spinner {
+      display: inline-block; width: 13px; height: 13px;
+      border: 2px solid #ffe082; border-top-color: #f59e0b;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+      vertical-align: middle; margin-right: 5px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .auth-toggle { text-align: center; margin-top: 1.25rem; font-size: 0.9rem; color: var(--text-sub); }
+    .auth-toggle a { color: var(--brand); font-weight: 600; cursor: pointer; text-decoration: none; }
+    .auth-toggle a:hover { text-decoration: underline; }
+
+    /* ── Top Bar ──────────────────────────────────── */
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: var(--topbar-h);
+      background: white;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 1.25rem;
+      z-index: 100;
+      gap: 1rem;
+    }
+
+    .topbar-logo {
+      display: flex; align-items: center; gap: 0.5rem;
+      text-decoration: none; flex-shrink: 0;
+    }
+    .topbar-logo .logo-icon {
+      width: 32px; height: 32px;
+      background: var(--brand); border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 0.95rem;
+    }
+    .topbar-logo .logo-name { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+
+    .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 0.75rem; }
+
+    .topbar-user {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+    .user-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%; background: var(--brand);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 0.85rem;
+    }
+    .btn-logout {
+      padding: 0.4rem 0.9rem;
+      border: 1.5px solid var(--border); border-radius: 20px;
+      background: white; font-size: 0.85rem; font-family: inherit;
+      cursor: pointer; color: var(--text-sub);
+      transition: all 0.2s;
+    }
+    .btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+    /* ── Layout ───────────────────────────────────── */
+    .left-column {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 1.25rem;
+      padding-top: calc(var(--topbar-h) + 1.25rem);
+    }
+
+    /* 發文框 */
+    .compose-box {
+      background: white; border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .compose-row { display: flex; gap: 0.75rem; align-items: center; }
+    .compose-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--brand);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
+    }
+    .compose-trigger {
+      flex: 1; padding: 0.65rem 1rem;
+      border: 1.5px solid var(--border); border-radius: 20px;
+      font-size: 0.9rem; color: var(--text-sub);
+      cursor: pointer; background: var(--bg);
+      transition: all 0.2s; text-align: left; font-family: inherit;
+    }
+    .compose-trigger:hover { border-color: var(--brand); background: white; color: var(--text); }
+
+    /* 發文 Modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1500; opacity: 0; visibility: hidden;
+      transition: all 0.2s;
+    }
+    .modal-overlay.show { opacity: 1; visibility: visible; }
+    .modal-box {
+      background: white; border-radius: 14px;
+      width: 100%; max-width: 560px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      overflow: hidden;
+      transform: scale(0.95); transition: transform 0.25s;
+    }
+    .modal-overlay.show .modal-box { transform: scale(1); }
+    .modal-head {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-head h3 { font-size: 1rem; font-weight: 700; }
+    .modal-close {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: none; background: var(--bg); cursor: pointer;
+      font-size: 1rem; color: var(--text-sub);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .modal-close:hover { background: var(--border); }
+    .modal-body { padding: 1.25rem; }
+    .modal-field { margin-bottom: 1rem; }
+    .modal-field label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-sub); margin-bottom: 0.375rem; }
+    .modal-field input, .modal-field textarea {
+      width: 100%; padding: 0.7rem 0.9rem;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: 0.92rem; font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .modal-field input:focus, .modal-field textarea:focus { outline: none; border-color: var(--brand); }
+    .modal-foot {
+      padding: 0.875rem 1.25rem;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end; gap: 0.75rem;
+    }
+    .btn-cancel {
+      padding: 0.6rem 1.25rem; border: 1.5px solid var(--border);
+      border-radius: 20px; background: white; cursor: pointer;
+      font-size: 0.9rem; font-family: inherit; color: var(--text-sub);
+      transition: all 0.2s;
+    }
+    .btn-cancel:hover { border-color: var(--text-sub); }
+    .btn-post {
+      padding: 0.6rem 1.5rem; border: none;
+      border-radius: 20px; background: var(--brand); color: white;
+      font-size: 0.9rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-post:hover { background: #1557b0; }
+
+    /* 文章卡片 */
+    .post-card {
+      background: white; border-radius: var(--radius);
+      border: 1px solid var(--border);
+      margin-bottom: 0.75rem;
+      transition: box-shadow 0.2s;
+      overflow: hidden;
+    }
+    .post-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+
+    .post-card-head { padding: 1rem 1.25rem 0.5rem; }
+    .post-author-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem; }
+    .post-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, #1a73e8, #34a853);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
+    }
+    .post-author-info { flex: 1; }
+    .post-author-name { font-size: 0.88rem; font-weight: 600; }
+    .post-time { font-size: 0.78rem; color: var(--text-sub); }
+    .post-tag {
+      font-size: 0.72rem; padding: 0.15rem 0.5rem;
+      background: var(--brand-light); color: var(--brand);
+      border-radius: 4px; font-weight: 600;
+    }
+
+    .post-title-text { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; line-height: 1.4; }
+    .post-body { font-size: 0.88rem; color: var(--text-sub); line-height: 1.6; margin-bottom: 0.75rem; }
+
+    .post-card-foot {
+      padding: 0.5rem 1rem;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; gap: 0;
+    }
+    .post-action {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.5rem 0.75rem; border-radius: 6px;
+      font-size: 0.84rem; color: var(--text-sub);
+      cursor: pointer; transition: all 0.15s; background: none; border: none; font-family: inherit;
+    }
+    .post-action:hover { background: var(--bg); color: var(--brand); }
+
+    /* 留言區 */
+    .comments-area {
+      display: none; padding: 0 1.25rem 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .comments-area.open { display: block; }
+    .comment-list { margin: 0.75rem 0; }
+    .comment-row { display: flex; gap: 0.6rem; margin-bottom: 0.6rem; }
+    .comment-ava {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--bg); border: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 700; color: var(--text-sub); flex-shrink: 0;
+    }
+    .comment-bubble {
+      background: var(--bg); border-radius: 0 10px 10px 10px;
+      padding: 0.5rem 0.75rem; font-size: 0.85rem; line-height: 1.5;
+    }
+    .comment-meta { font-size: 0.75rem; font-weight: 600; margin-bottom: 0.2rem; color: var(--text); }
+    .comment-input-wrap { display: flex; gap: 0.6rem; align-items: center; margin-top: 0.5rem; }
+    .comment-input-wrap .comment-ava { flex-shrink: 0; }
+    .comment-input {
+      flex: 1; padding: 0.5rem 0.9rem;
+      border: 1.5px solid var(--border); border-radius: 20px;
+      font-size: 0.875rem; font-family: inherit;
+      transition: border-color 0.2s; background: var(--bg);
+    }
+    .comment-input:focus { outline: none; border-color: var(--brand); background: white; }
+    .btn-send {
+      padding: 0.45rem 1rem;
+      background: var(--brand); color: white;
+      border: none; border-radius: 20px;
+      font-size: 0.84rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-send:hover { background: #1557b0; }
+
+    /* ── Right Panel ──────────────────────────────── */
+    .right-panel { width: 300px; flex-shrink: 0; }
+
+    .widget {
+      background: white; border-radius: var(--radius);
+      border: 1px solid var(--border);
+      margin-bottom: 1rem; overflow: hidden;
+    }
+    .widget-head {
+      padding: 0.875rem 1.1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .widget-body { padding: 1rem 1.1rem; }
+
+    /* 股票查詢 widget */
+    .stock-search-row { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .stock-search-row input {
+      flex: 1; padding: 0.55rem 0.75rem;
+      border: 1.5px solid var(--border); border-radius: 7px;
+      font-size: 0.875rem; font-family: inherit; text-transform: uppercase;
+    }
+    .stock-search-row input:focus { outline: none; border-color: var(--brand); }
+    .btn-search {
+      padding: 0.55rem 0.9rem;
+      background: var(--brand); color: white;
+      border: none; border-radius: 7px; font-size: 0.85rem;
+      cursor: pointer; font-family: inherit; transition: background 0.2s;
+    }
+    .btn-search:hover { background: #1557b0; }
+
+    .stock-info-box {
+      display: none; margin-top: 0.5rem;
+    }
+    .stock-info-box.show { display: block; }
+    .stock-info-name  { font-size: 0.82rem; color: var(--text-sub); margin-bottom: 0.15rem; }
+    .stock-info-price { font-size: 1.6rem; font-weight: 700; color: var(--green); }
+    .stock-info-hl    { font-size: 0.78rem; color: var(--text-sub); margin: 0.15rem 0 0.75rem; }
+
+    .period-row { display: flex; gap: 0.35rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+    .period-pill {
+      padding: 0.2rem 0.6rem;
+      border: 1px solid var(--border); border-radius: 12px;
+      font-size: 0.78rem; cursor: pointer; background: white;
+      transition: all 0.15s; font-family: inherit; color: var(--text-sub);
+    }
+    .period-pill.active { background: var(--brand); color: white; border-color: var(--brand); }
+    .chart-wrap { height: 140px; }
+
+    /* 交易記錄 widget */
+    .trade-mini-list { }
+    .trade-mini-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.85rem;
+    }
+    .trade-mini-item:last-child { border-bottom: none; }
+    .trade-mini-sym { font-weight: 700; }
+    .trade-mini-type { font-size: 0.75rem; padding: 0.1rem 0.45rem; border-radius: 4px; font-weight: 600; }
+    .trade-mini-type.buy  { background: #e8f5e9; color: var(--green); }
+    .trade-mini-type.sell { background: #fce8e8; color: var(--red); }
+    .trade-mini-price { font-weight: 600; color: var(--text); }
+
+    /* 新增交易 */
+    .trade-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .trade-field label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-sub); margin-bottom: 0.25rem; }
+    .trade-field input, .trade-field select {
+      width: 100%; padding: 0.5rem 0.6rem;
+      border: 1.5px solid var(--border); border-radius: 7px;
+      font-size: 0.85rem; font-family: inherit;
+    }
+    .trade-field input:focus, .trade-field select:focus { outline: none; border-color: var(--brand); }
+    .btn-trade {
+      width: 100%; margin-top: 0.6rem;
+      padding: 0.6rem; background: var(--brand); color: white;
+      border: none; border-radius: 7px; font-size: 0.875rem; font-weight: 600;
+      cursor: pointer; font-family: inherit; transition: background 0.2s;
+    }
+    .btn-trade:hover { background: #1557b0; }
+
+    /* ── Empty / Toast ────────────────────────────── */
+    .empty-msg { text-align: center; padding: 2rem 1rem; color: var(--text-sub); font-size: 0.9rem; }
+
+    .toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      background: #1c1e21; color: white;
+      padding: 0.7rem 1.2rem; border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.3s; z-index: 3000; font-size: 0.9rem;
+    }
+    .toast.show    { transform: translateY(0); opacity: 1; }
+    .toast.error   { background: var(--red); }
+    .toast.success { background: var(--green); }
+
+    @media (max-width: 600px) {
+      .left-column { padding: 0.75rem; padding-top: calc(var(--topbar-h) + 0.75rem); }
+    }
+  </style>
 </head>
 <body>
-    <div id="authOverlay" class="auth-overlay">
-        <div class="auth-card">
-            <div class="auth-header">
-                <h2 id="authTitle">登入會員</h2>
-                <p id="authSubtitle">請輸入您的帳號密碼</p>
-            </div>
-            <form class="auth-form" id="authForm">
-                <div class="form-group">
-                    <label for="username">帳號</label>
-                    <input type="text" id="username" placeholder="請輸入帳號" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">密碼</label>
-                    <input type="password" id="password" placeholder="請輸入密碼" required>
-                </div>
-                <button type="submit" class="auth-btn" id="authBtn">登入</button>
-            </form>
-            <div class="auth-footer">
-                <span id="authToggleText">還沒有帳號？</span>
-                <a id="authToggleLink">立即註冊</a>
-            </div>
-        </div>
+
+<!-- ── Auth Overlay ──────────────────────────────── -->
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-icon">S</div>
+      <span class="logo-text">StockBoard</span>
     </div>
-
-    <header class="header">
-        <div class="header-content">
-            <h1>股票交易與論壇</h1>
-            <div class="user-info" id="userInfo" style="display: none;">
-                <span class="username" id="displayUsername"></span>
-                <button class="logout-btn" id="logoutBtn">登出</button>
-            </div>
-        </div>
-    </header>
-
-    <div class="feed">
-        <div class="tabs">
-            <div class="tab active" data-tab="forum">論壇</div>
-            <div class="tab" data-tab="trades">交易紀錄</div>
-        </div>
-
-        <!-- Forum tab -->
-        <div class="tab-content active" id="forumTab">
-            <div class="create-card">
-                <div class="create-card-header">
-                    <div class="avatar" id="createPostAvatar"></div>
-                    <span>發布新文章</span>
-                </div>
-                <form id="postForm">
-                    <div class="form-group" style="display: none;">
-                        <label for="postUserId">使用者 ID</label>
-                        <input type="number" id="postUserId">
-                    </div>
-                    <div class="form-group">
-                        <input type="text" id="title" required placeholder="標題...">
-                    </div>
-                    <div class="form-group">
-                        <textarea id="content" rows="3" required placeholder="分享你的投資心得..."></textarea>
-                    </div>
-                    <button type="submit" class="btn">發布</button>
-                </form>
-            </div>
-            <div id="postsList"></div>
-        </div>
-
-        <!-- Trades tab -->
-        <div class="tab-content" id="tradesTab">
-            <div class="create-card">
-                <div class="create-card-header">
-                    <div class="avatar" id="createTradeAvatar"></div>
-                    <span>新增交易</span>
-                </div>
-                <form id="tradeForm">
-                    <div class="form-group" style="display: none;">
-                        <label for="userId">使用者 ID</label>
-                        <input type="number" id="userId">
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <input type="text" id="stockSymbol" required placeholder="股票代號 (如: 0050)">
-                        </div>
-                        <div class="form-group">
-                            <select id="tradeType" required>
-                                <option value="buy">買入</option>
-                                <option value="sell">賣出</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <input type="number" id="price" required min="0" step="0.01" placeholder="成交價">
-                        </div>
-                        <div class="form-group">
-                            <input type="number" id="quantity" required min="1" placeholder="股數">
-                        </div>
-                    </div>
-                    <button type="submit" class="btn">送出交易</button>
-                </form>
-            </div>
-            <div id="tradesList"></div>
-        </div>
+    <h2 id="authTitle">歡迎回來</h2>
+    <p class="auth-sub" id="authSub">登入以繼續使用所有功能</p>
+    <form id="authForm">
+      <div class="auth-field">
+        <label for="authUsername">帳號</label>
+        <input type="text" id="authUsername" placeholder="輸入你的帳號" required autocomplete="username">
+      </div>
+      <div class="auth-field">
+        <label for="authPassword">密碼</label>
+        <input type="password" id="authPassword" placeholder="輸入你的密碼" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="auth-submit" id="authBtn">登入</button>
+    </form>
+    <div id="wakeupHint" class="wakeup-hint">
+      <span class="spinner"></span><strong>伺服器喚醒中，請稍候約 30～60 秒...</strong>
     </div>
+    <div class="auth-toggle">
+      <span id="authToggleText">還沒有帳號？</span>
+      <a id="authToggleLink">立即註冊</a>
+    </div>
+  </div>
+</div>
 
-    <div id="toast" class="toast"></div>
+<!-- 發文 Modal -->
+<div id="postModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>建立新文章</h3>
+      <button class="modal-close" id="closeModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="postForm">
+        <div class="modal-field">
+          <label for="postTitle">標題</label>
+          <input type="text" id="postTitle" placeholder="文章標題" required>
+        </div>
+        <div class="modal-field">
+          <label for="postContent">內容</label>
+          <textarea id="postContent" rows="5" placeholder="分享你的投資想法、分析或心得..." required></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" id="cancelPost">取消</button>
+      <button class="btn-post" id="submitPost">發布文章</button>
+    </div>
+  </div>
+</div>
 
-    <script>
-        const API_BASE = 'https://web-design-67t2.onrender.com';
-        let isRegisterMode = false;
+<!-- ── Top Bar ───────────────────────────────────── -->
+<header class="topbar">
+  <a class="topbar-logo" href="#">
+    <div class="logo-icon">S</div>
+    <span class="logo-name">StockBoard</span>
+  </a>
 
-        function showToast(message, type = 'info') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = `toast show ${type}`;
-            setTimeout(() => {
-                toast.className = 'toast';
-            }, 3000);
-        }
+  <div class="topbar-right">
+    <div class="topbar-user" id="topbarUser" style="display:none;">
+      <div class="user-avatar" id="topbarAvatar"></div>
+      <span id="topbarName" style="font-size:0.9rem;font-weight:600;"></span>
+      <button class="btn-logout" id="logoutBtn">登出</button>
+    </div>
+  </div>
+</header>
 
-        function getUserId() {
-            return parseInt(localStorage.getItem('user_id') || '0');
-        }
+<!-- ── App Layout ────────────────────────────────── -->
+<div class="left-column">
 
-        function getUsername() {
-            return localStorage.getItem('username') || '';
-        }
+  <!-- 討論版 -->
+  <section id="forumSection">
+    <div class="compose-box">
+      <div class="compose-row">
+        <div class="compose-avatar" id="composeAvatar"></div>
+        <button class="compose-trigger" id="openPostModal">有什麼投資想法想分享嗎？</button>
+      </div>
+    </div>
+    <div id="postsList"></div>
+  </section>
 
-        function getInitial() {
-            return getUsername().charAt(0).toUpperCase();
-        }
+  <!-- 股票行情 -->
+  <section id="stockSection" style="display:none;">
+    <div class="widget">
+      <div class="widget-head">股票即時查詢</div>
+      <div class="widget-body">
+        <div class="stock-search-row">
+          <input type="text" id="stockQueryMain" placeholder="輸入代號，如 AAPL">
+          <button class="btn-search" id="searchStockMain">查詢</button>
+        </div>
+        <div id="stockInfoMain" class="stock-info-box">
+          <div class="stock-info-name" id="stockNameMain"></div>
+          <div class="stock-info-price" id="stockPriceMain"></div>
+          <div class="stock-info-hl" id="stockHLMain"></div>
+          <div class="period-row" id="periodRowMain">
+            <button class="period-pill active" data-period="5d">5天</button>
+            <button class="period-pill" data-period="1mo">1月</button>
+            <button class="period-pill" data-period="3mo">3月</button>
+            <button class="period-pill" data-period="6mo">6月</button>
+            <button class="period-pill" data-period="1y">1年</button>
+          </div>
+          <div class="chart-wrap"><canvas id="stockChartMain"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        function timeAgo(date) {
-            const seconds = Math.floor((new Date() - date) / 1000);
-            if (seconds < 60) return '剛剛';
-            const minutes = Math.floor(seconds / 60);
-            if (minutes < 60) return `${minutes} 分鐘前`;
-            const hours = Math.floor(minutes / 60);
-            if (hours < 24) return `${hours} 小時前`;
-            const days = Math.floor(hours / 24);
-            return `${days} 天前`;
-        }
+  <!-- 我的交易 (僅自己可見) -->
+  <section id="tradesSection" style="display:none;">
+    <div class="widget">
+      <div class="widget-head">新增交易紀錄</div>
+      <div class="widget-body">
+        <form id="tradeForm">
+          <div class="trade-form-grid">
+            <div class="trade-field">
+              <label>股票代號</label>
+              <input type="text" id="stockSymbol" placeholder="如 0050" required>
+            </div>
+            <div class="trade-field">
+              <label>買 / 賣</label>
+              <select id="tradeType">
+                <option value="buy">買入</option>
+                <option value="sell">賣出</option>
+              </select>
+            </div>
+            <div class="trade-field">
+              <label>成交價</label>
+              <input type="number" id="price" placeholder="0.00" min="0" step="0.01" required>
+            </div>
+            <div class="trade-field">
+              <label>股數</label>
+              <input type="number" id="quantity" placeholder="100" min="1" required>
+            </div>
+          </div>
+          <button type="submit" class="btn-trade">送出交易</button>
+        </form>
+      </div>
+    </div>
+    <div class="widget">
+      <div class="widget-head">交易歷史</div>
+      <div class="widget-body">
+        <div id="tradesList"></div>
+      </div>
+    </div>
+  </section>
 
-        function checkAuth() {
-            const userId = getUserId();
-            if (userId) {
-                document.getElementById('authOverlay').classList.add('hidden');
-                document.getElementById('userInfo').style.display = 'flex';
-                document.getElementById('displayUsername').textContent = getUsername();
-                document.getElementById('userId').value = userId;
-                document.getElementById('postUserId').value = userId;
-                document.getElementById('createPostAvatar').textContent = getInitial();
-                document.getElementById('createTradeAvatar').textContent = getInitial();
-                loadTrades();
-                loadPosts();
-            } else {
-                document.getElementById('authOverlay').classList.remove('hidden');
-                document.getElementById('userInfo').style.display = 'none';
-            }
-        }
+</div>
 
-        function toggleAuthMode() {
-            isRegisterMode = !isRegisterMode;
-            const authTitle = document.getElementById('authTitle');
-            const authSubtitle = document.getElementById('authSubtitle');
-            const authBtn = document.getElementById('authBtn');
-            const authToggleText = document.getElementById('authToggleText');
-            const authToggleLink = document.getElementById('authToggleLink');
+<div id="toast" class="toast"></div>
 
-            if (isRegisterMode) {
-                authTitle.textContent = '註冊會員';
-                authSubtitle.textContent = '建立新帳號開始使用';
-                authBtn.textContent = '註冊';
-                authToggleText.textContent = '已有帳號？';
-                authToggleLink.textContent = '立即登入';
-            } else {
-                authTitle.textContent = '登入會員';
-                authSubtitle.textContent = '請輸入您的帳號密碼';
-                authBtn.textContent = '登入';
-                authToggleText.textContent = '還沒有帳號？';
-                authToggleLink.textContent = '立即註冊';
-            }
-        }
+<script>
+const API_BASE = 'https://web-design-67t2.onrender.com';
+let isRegisterMode = false;
+let stockChartMain = null;
+let currentSymbolMain = '';
+let wakeupTimer = null;
 
-        // Tab switching
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                tab.classList.add('active');
-                document.getElementById(tab.dataset.tab + 'Tab').classList.add('active');
-            });
-        });
+// ── Utils ───────────────────────────────────────────
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function timeAgo(dateStr) {
+  const diff = (Date.now() - new Date(dateStr)) / 1000;
+  if (diff < 60) return '剛剛';
+  if (diff < 3600) return Math.floor(diff/60) + ' 分鐘前';
+  if (diff < 86400) return Math.floor(diff/3600) + ' 小時前';
+  return Math.floor(diff/86400) + ' 天前';
+}
+function avatarLetter(name) { return name ? name[0].toUpperCase() : '?'; }
 
-        document.getElementById('authToggleLink').addEventListener('click', toggleAuthMode);
+// 台股代號自動轉換：0050 → 0050.TW，TW0050 → 0050.TW，美股直接大寫
+function normalizeTicker(input) {
+  let sym = input.trim().toUpperCase();
+  // 移除用戶可能多打的 .TW（之後統一加）
+  sym = sym.replace(/\.TW$/i, '');
+  // TW0050 → 0050
+  if (/^TW\d/.test(sym)) sym = sym.slice(2);
+  // 純數字 或 4碼英數（如 2330、00878）→ 台股，補 .TW
+  if (/^\d{4,5}$/.test(sym) || /^\d{4,5}[A-Z]$/.test(sym)) sym = sym + '.TW';
+  return sym;
+}
+function getUserId()   { return parseInt(localStorage.getItem('user_id') || '0'); }
+function getUsername() { return localStorage.getItem('username') || ''; }
 
-        document.getElementById('authForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const authBtn = document.getElementById('authBtn');
+function showToast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast show ${type}`;
+  setTimeout(() => t.className = 'toast', 3000);
+}
 
-            authBtn.disabled = true;
-            authBtn.textContent = isRegisterMode ? '註冊中...' : '登入中...';
+// ── Wakeup hint ─────────────────────────────────────
+function startWakeup() { wakeupTimer = setTimeout(() => { document.getElementById('wakeupHint').style.display='block'; }, 4000); }
+function stopWakeup()  {
+  document.getElementById('wakeupHint').style.display='none';
+  if (wakeupTimer) { clearTimeout(wakeupTimer); wakeupTimer = null; }
+}
 
-            try {
-                if (isRegisterMode) {
-                    const response = await fetch(`${API_BASE}/register/`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username, password })
-                    });
+async function fetchWT(url, opts={}, ms=90000) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  try {
+    return await fetch(url, {...opts, signal: ctrl.signal});
+  } catch(e) {
+    throw new Error(e.name==='AbortError' ? '伺服器回應逾時，請稍後再試' : '無法連線，請確認網路');
+  } finally { clearTimeout(t); }
+}
 
-                    if (!response.ok) {
-                        const err = await response.json();
-                        throw new Error(err.detail || '註冊失敗');
-                    }
+// ── Auth ────────────────────────────────────────────
+function updateAuthUI() {
+  document.getElementById('authTitle').textContent    = isRegisterMode ? '建立帳號' : '歡迎回來';
+  document.getElementById('authSub').textContent      = isRegisterMode ? '填寫以下資料完成註冊' : '登入以繼續使用所有功能';
+  document.getElementById('authBtn').textContent      = isRegisterMode ? '註冊' : '登入';
+  document.getElementById('authToggleText').textContent = isRegisterMode ? '已有帳號？' : '還沒有帳號？';
+  document.getElementById('authToggleLink').textContent = isRegisterMode ? '立即登入' : '立即註冊';
+}
 
-                    showToast('註冊成功！請登入', 'success');
-                    toggleAuthMode();
-                } else {
-                    const response = await fetch(`${API_BASE}/login/`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username, password })
-                    });
+document.getElementById('authToggleLink').onclick = () => { isRegisterMode = !isRegisterMode; updateAuthUI(); };
 
-                    if (!response.ok) {
-                        const err = await response.json();
-                        throw new Error(err.detail || '登入失敗');
-                    }
+document.getElementById('authForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const username = document.getElementById('authUsername').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const btn = document.getElementById('authBtn');
+  btn.disabled = true; btn.textContent = isRegisterMode ? '註冊中...' : '登入中...';
+  startWakeup();
+  try {
+    if (isRegisterMode) {
+      const r = await fetchWT(`${API_BASE}/register/`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({username,password}) });
+      if (!r.ok) { const e=await r.json(); throw new Error(e.detail||'註冊失敗'); }
+      showToast('註冊成功！請登入', 'success');
+      isRegisterMode = false; updateAuthUI();
+    } else {
+      const r = await fetchWT(`${API_BASE}/login/`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({username,password}) });
+      if (!r.ok) { const e=await r.json(); throw new Error(e.detail||'登入失敗'); }
+      const d = await r.json();
+      localStorage.setItem('user_id', d.user_id);
+      localStorage.setItem('username', d.username);
+      showToast('登入成功！', 'success');
+      checkAuth();
+    }
+  } catch(err) { showToast(err.message, 'error'); }
+  finally { stopWakeup(); btn.disabled=false; btn.textContent=isRegisterMode?'註冊':'登入'; }
+});
 
-                    const data = await response.json();
-                    localStorage.setItem('user_id', data.user_id);
-                    localStorage.setItem('username', data.username);
+document.getElementById('logoutBtn').onclick = () => {
+  localStorage.removeItem('user_id'); localStorage.removeItem('username');
+  isRegisterMode = false; updateAuthUI();
+  document.getElementById('authForm').reset();
+  showToast('已登出');
+  checkAuth();
+};
 
-                    showToast('登入成功！', 'success');
-                    checkAuth();
-                }
-            } catch (error) {
-                showToast(error.message, 'error');
-            } finally {
-                authBtn.disabled = false;
-                authBtn.textContent = isRegisterMode ? '註冊' : '登入';
-            }
-        });
+function checkAuth() {
+  const uid = getUserId(); const name = getUsername();
+  if (uid) {
+    document.getElementById('authOverlay').classList.add('hidden');
+    document.getElementById('topbarUser').style.display='flex';
+    document.getElementById('topbarName').textContent = name;
+    document.getElementById('topbarAvatar').textContent = avatarLetter(name);
+    document.getElementById('composeAvatar').textContent = avatarLetter(name);
+    loadPosts(); loadTrades();
+  } else {
+    document.getElementById('authOverlay').classList.remove('hidden');
+    document.getElementById('topbarUser').style.display='none';
+  }
+}
 
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            localStorage.removeItem('user_id');
-            localStorage.removeItem('username');
-            document.getElementById('authForm').reset();
-            document.getElementById('tradesList').innerHTML = '';
-            document.getElementById('postsList').innerHTML = '';
-            showToast('已登出', 'info');
-            checkAuth();
-            toggleAuthMode();
-        });
+// ── Post Modal ───────────────────────────────────────
+document.getElementById('openPostModal').onclick = () => document.getElementById('postModal').classList.add('show');
+document.getElementById('closeModal').onclick    = () => document.getElementById('postModal').classList.remove('show');
+document.getElementById('cancelPost').onclick    = () => document.getElementById('postModal').classList.remove('show');
 
-        async function loadTrades() {
-            const userId = getUserId();
-            if (!userId) return;
+document.getElementById('submitPost').onclick = async () => {
+  const title   = document.getElementById('postTitle').value.trim();
+  const content = document.getElementById('postContent').value.trim();
+  if (!title || !content) { showToast('請填寫標題和內容', 'error'); return; }
+  try {
+    const r = await fetch(`${API_BASE}/posts/`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({user_id:getUserId(), title, content}) });
+    if (!r.ok) { const e=await r.json(); throw new Error(e.detail||'失敗'); }
+    showToast('文章發布成功！', 'success');
+    document.getElementById('postForm').reset();
+    document.getElementById('postModal').classList.remove('show');
+    loadPosts();
+  } catch(err) { showToast(err.message, 'error'); }
+};
 
-            try {
-                const response = await fetch(`${API_BASE}/trades/${userId}`);
-                if (!response.ok) throw new Error('載入失敗');
-                const trades = await response.json();
+// ── Posts ───────────────────────────────────────────
+async function loadPosts() {
+  try {
+    const r = await fetch(`${API_BASE}/posts/`);
+    if (!r.ok) throw new Error('載入失敗');
+    const posts = await r.json();
+    const container = document.getElementById('postsList');
+    if (!posts.length) { container.innerHTML = '<div class="empty-msg">目前還沒有文章，來發表第一篇吧！</div>'; return; }
+    container.innerHTML = posts.map(post => `
+      <div class="post-card">
+        <div class="post-card-head">
+          <div class="post-author-row">
+            <div class="post-avatar">${escapeHtml(avatarLetter(post.username))}</div>
+            <div class="post-author-info">
+              <div class="post-author-name">${escapeHtml(post.username)}</div>
+              <div class="post-time">${timeAgo(post.created_at)}</div>
+            </div>
+            <span class="post-tag">股票</span>
+          </div>
+          <div class="post-title-text">${escapeHtml(post.title)}</div>
+          <div class="post-body">${escapeHtml(post.content)}</div>
+        </div>
+        <div class="post-card-foot">
+          <button class="post-action" onclick="toggleComments(${post.id})">
+            💬 ${(post.comments||[]).length} 則留言
+          </button>
+        </div>
+        <div class="comments-area" id="comments_${post.id}">
+          <div class="comment-list">
+            ${(post.comments||[]).map(c => `
+              <div class="comment-row">
+                <div class="comment-ava">${escapeHtml(avatarLetter(c.username))}</div>
+                <div class="comment-bubble">
+                  <div class="comment-meta">${escapeHtml(c.username)} · <span style="font-weight:400;color:var(--text-sub)">${timeAgo(c.created_at)}</span></div>
+                  ${escapeHtml(c.content)}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="comment-input-wrap">
+            <div class="comment-ava">${escapeHtml(avatarLetter(getUsername()))}</div>
+            <input class="comment-input" id="commentInput_${post.id}" placeholder="留言...">
+            <button class="btn-send" onclick="submitComment(${post.id})">送出</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch(err) { console.error(err); }
+}
 
-                const container = document.getElementById('tradesList');
-                if (trades.length === 0) {
-                    container.innerHTML = '<div class="empty-state">尚無交易紀錄</div>';
-                    return;
-                }
+function toggleComments(postId) {
+  const area = document.getElementById(`comments_${postId}`);
+  area.classList.toggle('open');
+}
 
-                container.innerHTML = trades.map(trade => `
-                    <div class="card">
-                        <div class="post-header">
-                            <div class="avatar">${getInitial()}</div>
-                            <div class="post-header-info">
-                                <div class="post-header-username">${getUsername()}</div>
-                                <div class="post-header-time">${trade.stock_symbol}</div>
-                            </div>
-                            <span class="trade-${trade.trade_type}" style="font-weight: 600; font-size: 0.875rem;">
-                                ${trade.trade_type === 'buy' ? '買入' : '賣出'}
-                            </span>
-                        </div>
-                        <div class="trade-card">
-                            <div class="trade-row">
-                                <span class="trade-label">成交價</span>
-                                <span class="trade-value">${trade.price.toFixed(2)}</span>
-                            </div>
-                            <div class="trade-row">
-                                <span class="trade-label">股數</span>
-                                <span class="trade-value">${trade.quantity}</span>
-                            </div>
-                            <div class="trade-row">
-                                <span class="trade-label">總金額</span>
-                                <span class="trade-value">${(trade.price * trade.quantity).toFixed(2)}</span>
-                            </div>
-                            <div class="trade-row">
-                                <span class="trade-label">日期</span>
-                                <span class="trade-value">${new Date(trade.trade_date).toLocaleDateString('zh-TW')}</span>
-                            </div>
-                        </div>
-                        <div class="post-actions">
-                            <button class="action-btn">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                            </button>
-                            <button class="action-btn">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                            </button>
-                            <button class="action-btn" style="margin-left: auto;">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg>
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error('Error loading trades:', error);
-            }
-        }
+async function submitComment(postId) {
+  const input = document.getElementById(`commentInput_${postId}`);
+  const content = input?.value.trim();
+  if (!content) { showToast('請輸入留言', 'error'); return; }
+  try {
+    const r = await fetch(`${API_BASE}/comments/`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({user_id:getUserId(), post_id:postId, content}) });
+    if (!r.ok) { const e=await r.json(); throw new Error(e.detail||'失敗'); }
+    showToast('留言成功！', 'success');
+    loadPosts();
+  } catch(err) { showToast(err.message, 'error'); }
+}
 
-        async function loadPosts() {
-            try {
-                const response = await fetch(`${API_BASE}/posts/`);
-                if (!response.ok) throw new Error('載入失敗');
-                const posts = await response.json();
+// ── Trades ──────────────────────────────────────────
+async function loadTrades() {
+  const uid = getUserId(); if (!uid) return;
+  try {
+    const r = await fetch(`${API_BASE}/trades/${uid}`);
+    if (!r.ok) throw new Error();
+    const trades = await r.json();
+    const full = document.getElementById('tradesList');
+    if (!trades.length) { full.innerHTML='<div class="empty-msg">尚無交易紀錄</div>'; }
+    else {
+      full.innerHTML = trades.map(t => `
+        <div class="trade-mini-item">
+          <div>
+            <span class="trade-mini-sym">${escapeHtml(t.stock_symbol)}</span>
+            <span class="trade-mini-type ${t.trade_type==='buy'?'buy':'sell'}">${t.trade_type==='buy'?'買入':'賣出'}</span>
+            <span style="font-size:0.78rem;color:var(--text-sub);margin-left:0.4rem">${new Date(t.trade_date).toLocaleDateString('zh-TW')}</span>
+          </div>
+          <div>
+            <span class="trade-mini-price">$${parseFloat(t.price).toFixed(2)}</span>
+            <span style="font-size:0.78rem;color:var(--text-sub);margin-left:0.4rem">${parseInt(t.quantity)}股</span>
+          </div>
+        </div>
+      `).join('');
+    }
+  } catch(err) { console.error(err); }
+}
 
-                const container = document.getElementById('postsList');
-                if (posts.length === 0) {
-                    container.innerHTML = '<div class="empty-state">尚無文章</div>';
-                    return;
-                }
+document.getElementById('tradeForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const data = {
+    user_id: getUserId(),
+    stock_symbol: document.getElementById('stockSymbol').value.trim().toUpperCase(),
+    trade_type: document.getElementById('tradeType').value,
+    price: parseFloat(document.getElementById('price').value),
+    quantity: parseInt(document.getElementById('quantity').value)
+  };
+  try {
+    const r = await fetch(`${API_BASE}/trades/`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) });
+    if (!r.ok) { const e=await r.json(); throw new Error(e.detail||'失敗'); }
+    showToast('交易新增成功！', 'success');
+    e.target.reset(); loadTrades();
+  } catch(err) { showToast(err.message, 'error'); }
+});
 
-                container.innerHTML = posts.map(post => `
-                    <div class="card">
-                        <div class="post-header">
-                            <div class="avatar">${post.username.charAt(0).toUpperCase()}</div>
-                            <div class="post-header-info">
-                                <div class="post-header-username">${post.username}</div>
-                                <div class="post-header-time">${timeAgo(new Date(post.created_at))}</div>
-                            </div>
-                        </div>
-                        <div class="post-body">
-                            <div class="post-title">${post.title}</div>
-                            <div class="post-content">${post.content}</div>
-                        </div>
-                        <div class="post-actions">
-                            <button class="action-btn">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                            </button>
-                            <button class="action-btn">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                            </button>
-                            <button class="action-btn" style="margin-left: auto;">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg>
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error('Error loading posts:', error);
-            }
-        }
+// ── Stock ───────────────────────────────────────────
+function renderChart(canvasId, history, chartRef) {
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  if (chartRef) chartRef.destroy();
+  return new Chart(ctx, {
+    type:'line',
+    data: {
+      labels: history.map(d=>d.date),
+      datasets:[{ label:'收盤價', data:history.map(d=>d.close),
+        borderColor:'#1a73e8', backgroundColor:'rgba(26,115,232,0.08)',
+        borderWidth:2, pointRadius:history.length>60?0:2, fill:true, tension:0.3 }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{x:{ticks:{maxTicksLimit:6}},y:{ticks:{callback:v=>'$'+v}}}
+    }
+  });
+}
 
-        document.getElementById('tradeForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const data = {
-                user_id: getUserId(),
-                stock_symbol: document.getElementById('stockSymbol').value,
-                trade_type: document.getElementById('tradeType').value,
-                price: parseFloat(document.getElementById('price').value),
-                quantity: parseInt(document.getElementById('quantity').value)
-            };
+document.getElementById('searchStockMain').onclick = async () => {
+  const sym = normalizeTicker(document.getElementById('stockQueryMain').value);
+  if (!sym) { showToast('請輸入股票代號', 'error'); return; }
+  currentSymbolMain = sym;
+  try {
+    const r = await fetch(`${API_BASE}/stock/${encodeURIComponent(sym)}`);
+    if (!r.ok) { const e=await r.json(); throw new Error(e.detail||'查詢失敗'); }
+    const d = await r.json();
+    document.getElementById('stockNameMain').textContent  = `${escapeHtml(d.name)} (${escapeHtml(d.symbol)})`;
+    document.getElementById('stockPriceMain').textContent = `$${d.current_price.toFixed(2)}`;
+    document.getElementById('stockHLMain').textContent    = `今日高 $${d.high.toFixed(2)} · 今日低 $${d.low.toFixed(2)}`;
+    document.getElementById('stockInfoMain').classList.add('show');
+    await fetchHistory(sym, '1mo', 'stockChartMain', true);
+  } catch(err) { showToast(err.message, 'error'); }
+};
 
-            try {
-                const response = await fetch(`${API_BASE}/trades/`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
+async function fetchHistory(sym, period, canvasId, isMain) {
+  try {
+    const r = await fetch(`${API_BASE}/stock/${encodeURIComponent(sym)}/history?period=${period}`);
+    if (!r.ok) throw new Error('取得走勢失敗');
+    const data = await r.json();
+    if (isMain) { stockChartMain = renderChart(canvasId, data, stockChartMain); }
+  } catch(err) { showToast(err.message, 'error'); }
+}
 
-                if (!response.ok) {
-                    const err = await response.json();
-                    throw new Error(err.detail || '失敗');
-                }
+document.querySelectorAll('#periodRowMain .period-pill').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    document.querySelectorAll('#periodRowMain .period-pill').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    if (currentSymbolMain) await fetchHistory(currentSymbolMain, btn.dataset.period, 'stockChartMain', true);
+  });
+});
 
-                showToast('交易成功！', 'success');
-                e.target.reset();
-                loadTrades();
-            } catch (error) {
-                showToast(error.message, 'error');
-            }
-        });
-
-        document.getElementById('postForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const data = {
-                user_id: getUserId(),
-                title: document.getElementById('title').value,
-                content: document.getElementById('content').value
-            };
-
-            try {
-                const response = await fetch(`${API_BASE}/posts/`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-
-                if (!response.ok) {
-                    const err = await response.json();
-                    throw new Error(err.detail || '失敗');
-                }
-
-                showToast('文章發布成功！', 'success');
-                e.target.reset();
-                loadPosts();
-            } catch (error) {
-                showToast(error.message, 'error');
-            }
-        });
-
-        checkAuth();
-    </script>
+// ── Init ─────────────────────────────────────────────
+checkAuth();
+</script>
 </body>
 </html>
