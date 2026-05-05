@@ -7,6 +7,7 @@ from database import Base
 
 
 def utcnow():
+    """取代棄用的 datetime.utcnow()，使用 timezone-aware 的 UTC 時間"""
     return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
@@ -35,6 +36,7 @@ class TradeRecord(Base):
     trade_type = Column(Enum(TradeType), nullable=False)
     price = Column(Float, nullable=False)
     quantity = Column(Integer, nullable=False)
+    # 修正：改用 utcnow function 取代棄用的 datetime.utcnow
     trade_date = Column(DateTime, default=utcnow, nullable=False)
 
     user = relationship("User", back_populates="trade_records")
@@ -47,13 +49,14 @@ class Post(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     title = Column(String, nullable=False)
     content = Column(String, nullable=False)
+    # 修正：改用 utcnow function 取代棄用的 datetime.utcnow
     created_at = Column(DateTime, default=utcnow, nullable=False)
 
     user = relationship("User", back_populates="posts")
-    comments = relationship("Comment", back_populates="post", order_by="Comment.created_at")
 
 
 class Comment(Base):
+    """新增留言 model，讓使用者可以在文章下方留言交流"""
     __tablename__ = "comments"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -64,3 +67,7 @@ class Comment(Base):
 
     post = relationship("Post", back_populates="comments")
     user = relationship("User")
+
+
+# 在 Post 補上 comments relationship
+Post.comments = relationship("Comment", back_populates="post", order_by="Comment.created_at")

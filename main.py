@@ -10,32 +10,32 @@ from models import TradeRecord, User, TradeType, Post, Comment
 import yfinance
 import bcrypt
 
-# 完全不用 passlib，直接用 bcrypt 套件，沒有 72 bytes 限制問題
+
+# ─── 密碼工具（使用 bcrypt 套件，不依賴 passlib）────────────────────────────────
+
+def _trim_password(password: str) -> bytes:
+    """bcrypt 限制 72 bytes，超過需截斷（字元層級，避免切斷中文字）"""
+    encoded = password.encode("utf-8")
+    if len(encoded) <= 72:
+        return encoded
+    total = 0
+    for i, ch in enumerate(password):
+        char_len = len(ch.encode("utf-8"))
+        if total + char_len > 72:
+            return password[:i].encode("utf-8")
+        total += char_len
+    return encoded
+
 def hash_password(password: str) -> str:
-    pwd_bytes = password.encode("utf-8")
-    # bcrypt 限制 72 bytes，超過就截斷（字元層級，避免切斷中文）
-    if len(pwd_bytes) > 72:
-        total = 0
-        for i, ch in enumerate(password):
-            char_len = len(ch.encode("utf-8"))
-            if total + char_len > 72:
-                password = password[:i]
-                break
-            total += char_len
-    salt = bcrypt.gensalt()
-    return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
+    pwd_bytes = _trim_password(password)
+    return bcrypt.hashpw(pwd_bytes, bcrypt.gensalt()).decode("utf-8")
 
 def verify_password(password: str, hashed: str) -> bool:
-    pwd_bytes = password.encode("utf-8")
-    if len(pwd_bytes) > 72:
-        total = 0
-        for i, ch in enumerate(password):
-            char_len = len(ch.encode("utf-8"))
-            if total + char_len > 72:
-                password = password[:i]
-                break
-            total += char_len
-    return bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8"))
+    pwd_bytes = _trim_password(password)
+    return bcrypt.checkpw(pwd_bytes, hashed.encode("utf-8"))
+
+
+# ─── App 初始化 ────────────────────────────────────────────────────────────────
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -51,6 +51,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ─── Auth Models ──────────────────────────────────────────────────────────────
 
 class RegisterRequest(BaseModel):
     username: str
@@ -68,23 +71,29 @@ class LoginResponse(BaseModel):
     user_id: int
     username: str
 
+
+# ─── Auth Routes ──────────────────────────────────────────────────────────────
+
 @app.post("/register/", response_model=RegisterResponse)
 def register(request: RegisterRequest, db: Session = Depends(get_db)):
     try:
         existing_user = db.query(User).filter(User.username == request.username).first()
         if existing_user:
             raise HTTPException(status_code=400, detail="Username already exists")
+
         hashed_password = hash_password(request.password)
         new_user = User(username=request.username, password=hashed_password)
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
         return RegisterResponse(id=new_user.id, username=new_user.username)
+
     except HTTPException:
         raise
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/login/", response_model=LoginResponse)
 def login(request: LoginRequest, db: Session = Depends(get_db)):
@@ -92,13 +101,19 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
         user = db.query(User).filter(User.username == request.username).first()
         if not user:
             raise HTTPException(status_code=401, detail="Invalid username or password")
+
         if not verify_password(request.password, user.password):
             raise HTTPException(status_code=401, detail="Invalid username or password")
+
         return LoginResponse(user_id=user.id, username=user.username)
+
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ─── Trade Models ─────────────────────────────────────────────────────────────
 
 class TradeCreate(BaseModel):
     user_id: int
@@ -120,13 +135,18 @@ class TradeResponse(BaseModel):
     class Config:
         orm_mode = True
 
+
+# ─── Trade Routes ─────────────────────────────────────────────────────────────
+
 @app.post("/trades/", response_model=TradeResponse)
 def create_trade(trade: TradeCreate, db: Session = Depends(get_db)):
     try:
         user = db.query(User).filter(User.id == trade.user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
+
         trade_type_enum = TradeType.BUY if trade.trade_type.lower() == "buy" else TradeType.SELL
+
         db_trade = TradeRecord(
             user_id=trade.user_id,
             stock_symbol=trade.stock_symbol,
@@ -138,6 +158,7 @@ def create_trade(trade: TradeCreate, db: Session = Depends(get_db)):
         db.add(db_trade)
         db.commit()
         db.refresh(db_trade)
+
         return TradeResponse(
             id=db_trade.id,
             user_id=db_trade.user_id,
@@ -153,12 +174,14 @@ def create_trade(trade: TradeCreate, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.get("/trades/{user_id}", response_model=List[TradeResponse])
 def get_user_trades(user_id: int, db: Session = Depends(get_db)):
     try:
         user = db.query(User).filter(User.id == user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
+
         trades = db.query(TradeRecord).filter(TradeRecord.user_id == user_id).all()
         return [
             TradeResponse(
@@ -176,6 +199,9 @@ def get_user_trades(user_id: int, db: Session = Depends(get_db)):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ─── Post Models ──────────────────────────────────────────────────────────────
 
 class PostCreate(BaseModel):
     user_id: int
@@ -209,16 +235,21 @@ class CommentCreate(BaseModel):
     post_id: int
     content: str
 
+
+# ─── Post Routes ──────────────────────────────────────────────────────────────
+
 @app.post("/posts/", response_model=PostResponse)
 def create_post(post: PostCreate, db: Session = Depends(get_db)):
     try:
         user = db.query(User).filter(User.id == post.user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
+
         db_post = Post(user_id=post.user_id, title=post.title, content=post.content)
         db.add(db_post)
         db.commit()
         db.refresh(db_post)
+
         return PostResponse(
             id=db_post.id,
             user_id=db_post.user_id,
@@ -233,6 +264,7 @@ def create_post(post: PostCreate, db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/posts/", response_model=List[PostResponse])
 def get_all_posts(db: Session = Depends(get_db)):
@@ -265,15 +297,18 @@ def get_all_posts(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.post("/comments/", response_model=CommentResponse)
 def create_comment(comment: CommentCreate, db: Session = Depends(get_db)):
     try:
         user = db.query(User).filter(User.id == comment.user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
+
         post = db.query(Post).filter(Post.id == comment.post_id).first()
         if not post:
             raise HTTPException(status_code=404, detail="Post not found")
+
         db_comment = Comment(
             post_id=comment.post_id,
             user_id=comment.user_id,
@@ -282,6 +317,7 @@ def create_comment(comment: CommentCreate, db: Session = Depends(get_db)):
         db.add(db_comment)
         db.commit()
         db.refresh(db_comment)
+
         return CommentResponse(
             id=db_comment.id,
             user_id=db_comment.user_id,
@@ -294,6 +330,9 @@ def create_comment(comment: CommentCreate, db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ─── Stock Routes ─────────────────────────────────────────────────────────────
 
 class StockInfo(BaseModel):
     symbol: str
@@ -310,17 +349,21 @@ class StockHistory(BaseModel):
     close: float
     volume: int
 
+
 @app.get("/stock/{symbol}", response_model=StockInfo)
 def get_stock_price(symbol: str):
     try:
         ticker = yfinance.Ticker(symbol)
         info = ticker.info
+
         current_price = info.get("currentPrice") or info.get("regularMarketPreviousClose")
         high = info.get("dayHigh") or info.get("regularMarketDayHigh")
         low = info.get("dayLow") or info.get("regularMarketDayLow")
         name = info.get("shortName") or info.get("longName") or symbol
+
         if current_price is None:
             raise HTTPException(status_code=404, detail=f"找不到股票代號: {symbol}")
+
         return StockInfo(
             symbol=symbol.upper(),
             name=name,
@@ -333,13 +376,20 @@ def get_stock_price(symbol: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"取得股價失敗: {str(e)}")
 
+
 @app.get("/stock/{symbol}/history", response_model=List[StockHistory])
 def get_stock_history(symbol: str, period: str = "1mo"):
+    """
+    取得股票歷史走勢
+    period 可傳入：1d, 5d, 1mo, 3mo, 6mo, 1y
+    """
     try:
         ticker = yfinance.Ticker(symbol)
         hist = ticker.history(period=period)
+
         if hist.empty:
             raise HTTPException(status_code=404, detail=f"找不到股票代號: {symbol}")
+
         result = []
         for date, row in hist.iterrows():
             result.append(StockHistory(
@@ -351,10 +401,12 @@ def get_stock_history(symbol: str, period: str = "1mo"):
                 volume=int(row["Volume"])
             ))
         return result
+
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"取得走勢失敗: {str(e)}")
+
 
 if __name__ == "__main__":
     import uvicorn
