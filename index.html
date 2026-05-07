@@ -234,6 +234,21 @@
     .toast.error { background:var(--red); }
     .toast.success { background:var(--green); }
 
+    /* ── Edit Profile Modal ─────────────────────────── */
+    .board-tag {
+      display:inline-flex; align-items:center; gap:.4rem;
+      padding:.35rem .85rem; border-radius:20px;
+      font-size:.82rem; font-weight:600; cursor:pointer;
+      border:1.5px solid var(--border); background:white; font-family:inherit;
+      transition:all .2s; color:var(--text);
+    }
+    .board-tag:hover { border-color:var(--brand); color:var(--brand); background:var(--brand-light); }
+    .board-tag.active { background:var(--brand); color:white; border-color:var(--brand); }
+    .board-filter-row { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1rem; }
+
+    /* Bio text */
+    .profile-bio { font-size:.88rem; color:var(--sub); margin-bottom:.75rem; font-style:italic; }
+
     @media(max-width:768px) {
       .sidebar { display:none; }
       .main { margin-left:0; }
@@ -271,6 +286,21 @@
     <div class="modal-foot">
       <button class="btn-cancel" id="cancelPost">取消</button>
       <button class="btn-post" id="submitPost">發布文章</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div id="editProfileModal" class="modal-bg">
+  <div class="modal">
+    <div class="modal-head"><h3>編輯個人資料</h3><button class="modal-x" id="closeEditProfile">✕</button></div>
+    <div class="modal-body">
+      <div class="mf"><label>顯示名稱</label><input type="text" id="editDisplayName" placeholder="你的顯示名稱" maxlength="20"></div>
+      <div class="mf"><label>自我介紹</label><textarea id="editBio" rows="3" placeholder="介紹一下自己...（最多100字）" maxlength="100"></textarea></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" id="cancelEditProfile">取消</button>
+      <button class="btn-post" id="saveEditProfile">儲存</button>
     </div>
   </div>
 </div>
@@ -316,6 +346,13 @@
 
     <!-- 討論板 -->
     <div id="page-forum" class="page active">
+      <div class="board-filter-row">
+        <button class="board-tag active" data-board="all">🔥 全部</button>
+        <button class="board-tag" data-board="台股">🇹🇼 台股</button>
+        <button class="board-tag" data-board="美股">🇺🇸 美股</button>
+        <button class="board-tag" data-board="加密貨幣">₿ 加密貨幣</button>
+        <button class="board-tag" data-board="投資新手">💡 投資新手</button>
+      </div>
       <div class="compose-box">
         <div class="compose-row">
           <div class="c-avatar" id="composeAva"></div>
@@ -604,11 +641,12 @@ function renderSelfProfile() {
         <div class="profile-ava-wrap"><div class="profile-ava">${esc(ava(name))}</div></div>
         <div class="profile-name">${esc(name)}</div>
         <div class="profile-handle">@${esc(name.toLowerCase())}</div>
+        ${getBio() ? `<div class="profile-bio">${esc(getBio())}</div>` : ''}
         <div class="profile-stats">
           <div class="ps-item"><div class="ps-num">${myPosts.length}</div><div class="ps-label">文章</div></div>
           <div class="ps-item"><div class="ps-num">${following.length}</div><div class="ps-label">追蹤中</div></div>
         </div>
-        <button class="own-profile-btn">編輯個人資料</button>
+        <button class="own-profile-btn" onclick="openEditProfile()">編輯個人資料</button>
       </div>
       <div class="profile-posts-title">我的文章（${myPosts.length}）</div>
       <div id="selfPosts" style="padding:0 1.25rem 1rem"></div>
