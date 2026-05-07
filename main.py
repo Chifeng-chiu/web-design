@@ -314,7 +314,7 @@ def create_comment(comment: CommentCreate, db: Session = Depends(get_db)):
             user_id=comment.user_id,
             content=comment.content
         )
-        db.add(db_comment) 
+        db.add(db_comment)
         db.commit()
         db.refresh(db_comment)
 
