@@ -39,7 +39,7 @@ class TradeRecord(Base):
     # 修正：改用 utcnow function 取代棄用的 datetime.utcnow
     trade_date = Column(DateTime, default=utcnow, nullable=False)
 
-    user = relationship("User", back_populates="trade_records")
+    user = relationship("User", back_populates="trade_records") 
 
 
 class Post(Base):
