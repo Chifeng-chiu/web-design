@@ -767,6 +767,62 @@ document.querySelectorAll('#periodRow .pp').forEach(btn => {
   });
 });
 
+// ── Edit Profile ──────────────────────────────────────────
+function getBio() { return localStorage.getItem('bio') || ''; }
+function getDisplayName() { return localStorage.getItem('displayName') || uname(); }
+
+function openEditProfile() {
+  document.getElementById('editDisplayName').value = getDisplayName();
+  document.getElementById('editBio').value = getBio();
+  document.getElementById('editProfileModal').classList.add('show');
+}
+
+document.getElementById('closeEditProfile').onclick = () => document.getElementById('editProfileModal').classList.remove('show');
+document.getElementById('cancelEditProfile').onclick = () => document.getElementById('editProfileModal').classList.remove('show');
+document.getElementById('saveEditProfile').onclick = () => {
+  const name = document.getElementById('editDisplayName').value.trim();
+  const bio  = document.getElementById('editBio').value.trim();
+  if (name) localStorage.setItem('displayName', name);
+  localStorage.setItem('bio', bio);
+  document.getElementById('editProfileModal').classList.remove('show');
+  toast('個人資料已更新！', 'success');
+  renderSelfProfile();
+};
+
+// ── Board Filter ───────────────────────────────────────────
+let currentBoard = 'all';
+
+document.querySelectorAll('.board-tag').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentBoard = btn.dataset.board;
+    document.querySelectorAll('.board-tag').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterPosts();
+  });
+});
+
+document.querySelectorAll('.sb-item:not([data-page])').forEach(el => {
+  el.addEventListener('click', () => {
+    const text = el.textContent.trim();
+    const boards = ['台股','美股','加密貨幣','投資新手'];
+    const matched = boards.find(b => text.includes(b));
+    showPage('forum');
+    const matchBtn = matched
+      ? [...document.querySelectorAll('.board-tag')].find(b => b.dataset.board === matched)
+      : document.querySelector('.board-tag[data-board="all"]');
+    if (matchBtn) matchBtn.click();
+  });
+});
+
+function filterPosts() {
+  if (currentBoard === 'all') { renderPosts(allPosts, 'postsList'); return; }
+  const filtered = allPosts.filter(p =>
+    p.title.includes(currentBoard) || p.content.includes(currentBoard)
+  );
+  renderPosts(filtered.length ? filtered : [], 'postsList');
+  if (!filtered.length) document.getElementById('postsList').innerHTML = `<div class="empty">目前「${currentBoard}」還沒有文章，來發表第一篇吧！</div>`;
+}
+
 // ── Init ──────────────────────────────────────────────────
 checkAuth();
 </script>
