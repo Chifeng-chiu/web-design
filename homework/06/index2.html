@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 函數學習網頁</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .question-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+        .question-card:hover {
+            transform: translateY(-5px);
+        }
+        .question-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .question-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-right: 15px;
+        }
+        .question-title {
+            font-size: 1.3em;
+            color: #333;
+            font-weight: 600;
+        }
+        .question-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            line-height: 1.8;
+            color: #444;
+        }
+        .answer-section {
+            margin-top: 15px;
+        }
+        .toggle-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+        .toggle-btn:hover {
+            background: #218838;
+        }
+        .answer-content {
+            display: none;
+            margin-top: 15px;
+            padding: 20px;
+            background: #e8f5e9;
+            border-left: 4px solid #28a745;
+            border-radius: 0 10px 10px 0;
+            animation: slideDown 0.3s ease-out;
+        }
+        .answer-content.show {
+            display: block;
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        .code-block .comment {
+            color: #6a9955;
+        }
+        .code-block .keyword {
+            color: #c586c0;
+        }
+        .code-block .string {
+            color: #ce9178;
+        }
+        .code-block .function {
+            color: #dcdcaa;
+        }
+        .analysis {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .analysis h4 {
+            color: #e65100;
+            margin-bottom: 10px;
+        }
+        .nav-buttons {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .nav-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        .nav-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: rgba(255,255,255,0.3);
+        }
+        .progress-fill {
+            height: 100%;
+            background: white;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+    
+    <div class="container">
+        <h1>JavaScript 函數學習題目</h1>
+        
+        <!-- 第1題 -->
+        <div class="question-card" id="q1">
+            <div class="question-header">
+                <div class="question-number">1</div>
+                <div class="question-title">Callback 基礎實作</div>
+            </div>
+            <div class="question-content">
+                建立一個名為 <code>mathTool</code> 的函數。它接受三個參數：num1, num2 以及一個 action（回呼函數）。
+                <br><br>
+                <strong>要求：</strong>呼叫 <code>mathTool(10, 5, ...)</code> 時，分別傳入不同的匿名函數來達成「相加」與「相減」。
+                <br><br>
+                <strong>範例輸出：</strong> 15, 5
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a1')">顯示解答與解析</button>
+                <div class="answer-content" id="a1">
+                    <div class="code-block">
+<span class="keyword">function</span> <span class="function">mathTool</span>(num1, num2, action) {
+  <span class="keyword">return</span> action(num1, num2);
+}
+
+<span class="comment">// 相加</span>
+console.<span class="function">log</span>(<span class="function">mathTool</span>(<span class="string">10</span>, <span class="string">5</span>, (a, b) => a + b)); <span class="comment">// 輸出: 15</span>
+
+<span class="comment">// 相減</span>
+console.<span class="function">log</span>(<span class="function">mathTool</span>(<span class="string">10</span>, <span class="string">5</span>, (a, b) => a - b)); <span class="comment">// 輸出: 5</span>
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p>Callback（回呼函數）是一種將函數作為參數傳遞的技術。<code>mathTool</code> 接收一個 action 函數作為參數，然後在內部執行這個函數。</p>
+                        <p>這裡使用了箭頭函數語法，可以更簡潔地定義匿名函數。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第2題 -->
+        <div class="question-card" id="q2">
+            <div class="question-header">
+                <div class="question-number">2</div>
+                <div class="question-title">匿名函數與立即執行 (IIFE)</div>
+            </div>
+            <div class="question-content">
+                寫出一個立即執行函數 (IIFE)，該函數內部定義一個區域變數 <code>count = 100</code>，並在執行時直接在控制台印出 "Count is: 100"。
+                <br><br>
+                <strong>要求：</strong>確保外部無法存取到這個 count 變數。
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a2')">顯示解答與解析</button>
+                <div class="answer-content" id="a2">
+                    <div class="code-block">
+(<span class="keyword">function</span>() {
+  <span class="keyword">let</span> count = <span class="string">100</span>;
+  console.<span class="function">log</span>(<span class="string">"Count is: "</span> + count);
+})();
+
+<span class="comment">// 外部無法存取 count - 會報錯</span>
+<span class="comment">// console.log(count); // ReferenceError: count is not defined</span>
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p><strong>IIFE</strong>（Immediately Invoked Function Expression，立即呼叫函數表達式）是一種定義後立即執行的函數。</p>
+                        <p>語法：<code>(function() { ... })()</code></p>
+                        <p>由於 <code>count</code> 是在函數內部宣告的區域變數，外部無法訪問，這就是<strong>閉包</strong>的作用之一，用於建立私有變數。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第3題 -->
+        <div class="question-card" id="q3">
+            <div class="question-header">
+                <div class="question-number">3</div>
+                <div class="question-title">箭頭函數與陣列轉換</div>
+            </div>
+            <div class="question-content">
+                給定一個陣列 <code>const prices = [100, 200, 300, 400]</code>。請使用 map 方法結合箭頭函數，產生一個新陣列，內容是原價格打 8 折後的結果。
+                <br><br>
+                <strong>要求：</strong>程式碼需簡潔，盡量使用單行箭頭函數。
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a3')">顯示解答與解析</button>
+                <div class="answer-content" id="a3">
+                    <div class="code-block">
+<span class="keyword">const</span> prices = [<span class="string">100</span>, <span class="string">200</span>, <span class="string">300</span>, <span class="string">400</span>];
+
+<span class="comment">// 方法1：完整箭頭函數</span>
+<span class="keyword">const</span> discounted1 = prices.<span class="function">map</span>(price => price * <span class="string">0.8</span>);
+
+<span class="comment">// 方法2：更簡潔（隱含 return）</span>
+<span class="keyword">const</span> discounted2 = prices.<span class="function">map</span>(p => p * <span class="string">0.8</span>);
+
+console.<span class="function">log</span>(discounted1); <span class="comment">// [80, 160, 240, 320]</span>
+console.<span class="function">log</span>(discounted2); <span class="comment">// [80, 160, 240, 320]</span>
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p><code>map()</code> 方法會建立新陣列，陣列中的每個元素都是原始陣列中的每個元素呼叫一次所提供的函數後的結果。</p>
+                        <p>單行箭頭函數的特色：當函數主體只有一個表達式時，可以省略大括號和 <code>return</code> 關鍵字。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第4題 -->
+        <div class="question-card" id="q4">
+            <div class="question-header">
+                <div class="question-number">4</div>
+                <div class="question-title">陣列參數的「破壞性修改」</div>
+            </div>
+            <div class="question-content">
+                撰寫一個函數 <code>cleanData(arr)</code>。
+                <br><br>
+                <strong>內部邏輯：</strong>使用陣列方法移除傳進來的陣列最後一個元素，並在最前面加上 "Start"。
+                <br><br>
+                <strong>驗證：</strong>宣告 <code>let myData = [1, 2, 3]</code>，執行 <code>cleanData(myData)</code> 後，觀察 myData 的內容。
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a4')">顯示解答與解析</button>
+                <div class="answer-content" id="a4">
+                    <div class="code-block">
+<span class="keyword">function</span> <span class="function">cleanData</span>(arr) {
+  arr.<span class="function">pop</span>();        <span class="comment">// 移除最後一個元素</span>
+  arr.<span class="function">unshift</span>(<span class="string">"Start"</span>); <span class="comment">// 在最前面加入 "Start"</span>
+}
+
+<span class="keyword">let</span> myData = [<span class="string">1</span>, <span class="string">2</span>, <span class="string">3</span>];
+<span class="function">cleanData</span>(myData);
+console.<span class="function">log</span>(myData); <span class="comment">// ["Start", 1, 2]</span>
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p>在 JavaScript 中，陣列是<strong>傳址呼叫（pass by reference）</strong>。這意味著當你將陣列傳入函數時，函數內部對陣列的修改會影響到原始陣列。</p>
+                        <p><code>pop()</code>：移除陣列最後一個元素，並返回該元素<br>
+                        <code>unshift()</code>：在陣列開頭加入新元素</p>
+                        <p><strong>注意：</strong>這就是所謂的「破壞性修改」，在開發中需要特別注意，避免意外修改原始資料。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第5題 -->
+        <div class="question-card" id="q5">
+            <div class="question-header">
+                <div class="question-number">5</div>
+                <div class="question-title">函數回傳函數 (Higher-Order Function)</div>
+            </div>
+            <div class="question-content">
+                寫一個函數 <code>multiplier(factor)</code>，它會「回傳」另一個箭頭函數。這個被回傳的函數接受一個數字參數 n，並回傳 n * factor。
+                <br><br>
+                <strong>範例用法：</strong>
+                <pre>const double = multiplier(2);
+console.log(double(10)); // 預期輸出 20</pre>
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a5')">顯示解答與解析</button>
+                <div class="answer-content" id="a5">
+                    <div class="code-block">
+<span class="keyword">function</span> <span class="function">multiplier</span>(factor) {
+  <span class="keyword">return</span> (n) => n * factor;
+}
+
+<span class="comment">// 使用範例</span>
+<span class="keyword">const</span> double = <span class="function">multiplier</span>(<span class="string">2</span>);
+<span class="keyword">const</span> triple = <span class="function">multiplier</span>(<span class="string">3</span>);
+
+console.<span class="function">log</span>(double(<span class="string">10</span>)); <span class="comment">// 20</span>
+console.<span class="function">log</span>(triple(<span class="string">10</span>)); <span class="comment">// 30</span>
+console.<span class="function">log</span>(<span class="function">multiplier</span>(<span class="string">5</span>)(<span class="string">10</span>)); <span class="comment">// 50</span>
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p><strong>Higher-Order Function（高階函數）</strong>是指接收函數作為參數，或回傳函數作為結果的函數。</p>
+                        <p><code>multiplier</code> 函數建立了<strong>閉包（closure）</strong>：內部函數可以存取外部函數的 <code>factor</code> 參數，即使外部函數已經執行完畢。</p>
+                        <p>這是一個很強大的設計模式，可以用來建立函數工廠！</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第6題 -->
+        <div class="question-card" id="q6">
+            <div class="question-header">
+                <div class="question-number">6</div>
+                <div class="question-title">Callback 篩選器</div>
+            </div>
+            <div class="question-content">
+                手寫一個類似 filter 的函數，名為 <code>myFilter(arr, callback)</code>。
+                <br><br>
+                <strong>邏輯：</strong>建立一個新陣列，遍歷 arr，若 callback(item) 回傳為 true，則將該元素放入新陣列。
+                <br><br>
+                <strong>測試：</strong>使用此函數篩選出 [1, 5, 8, 12] 中大於 7 的數字。
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a6')">顯示解答與解析</button>
+                <div class="answer-content" id="a6">
+                    <div class="code-block">
+<span class="keyword">function</span> <span class="function">myFilter</span>(arr, callback) {
+  <span class="keyword">const</span> result = [];
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="string">0</span>; i < arr.length; i++) {
+    <span class="keyword">if</span> (callback(arr[i])) {
+      result.<span class="function">push</span>(arr[i]);
+    }
+  }
+  <span class="keyword">return</span> result;
+}
+
+<span class="comment">// 測試</span>
+<span class="keyword">const</span> numbers = [<span class="string">1</span>, <span class="string">5</span>, <span class="string">8</span>, <span class="string">12</span>];
+<span class="keyword">const</span> filtered = <span class="function">myFilter</span>(numbers, n => n > <span class="string">7</span>);
+
+console.<span class="function">log</span>(filtered); <span class="comment">// [8, 12]</span>
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p><code>myFilter</code> 的實作展示了 callback 的經典用法：將判斷邏輯抽象化，讓函數更具彈性。</p>
+                        <p>關鍵步驟：<br>
+                        1. 建立空陣列存放結果<br>
+                        2. 遍歷原始陣列的每個元素<br>
+                        3. 將 callback 函數套用在每個元素上<br>
+                        4. 若回傳 true，將該元素加入結果陣列</p>
+                        <p>這就是 JavaScript 原生 <code>Array.prototype.filter</code> 的基本原理！</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第7題 -->
+        <div class="question-card" id="q7">
+            <div class="question-header">
+                <div class="question-number">7</div>
+                <div class="question-title">箭頭函數處理物件</div>
+            </div>
+            <div class="question-content">
+                給定一個包含物件的陣列 <code>const users = [{name: "Alice", age: 25}, {name: "Bob", age: 17}]</code>。
+                <br><br>
+                <strong>任務：</strong>使用 filter 與箭頭函數，篩選出所有 age 大於或等於 18 的人。
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a7')">顯示解答與解析</button>
+                <div class="answer-content" id="a7">
+                    <div class="code-block">
+<span class="keyword">const</span> users = [
+  {name: <span class="string">"Alice"</span>, age: <span class="string">25</span>}, 
+  {name: <span class="string">"Bob"</span>, age: <span class="string">17</span>}
+];
+
+<span class="keyword">const</span> adults = users.<span class="function">filter</span>(user => user.age >= <span class="string">18</span>);
+
+console.<span class="function">log</span>(adults); 
+<span class="comment">// [{name: "Alice", age: 25}]</span>
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p>當處理物件陣列時，箭頭函數的參數會是整個物件。我們可以透過 <code>物件.屬性</code> 來存取物件的特定屬性。</p>
+                        <p>這裡 <code>user => user.age >= 18</code> 是箭頭函數的標準用法：<br>
+                        - <code>user</code>：代表陣列中的每個元素（物件）<br>
+                        - <code>user.age</code>：存取物件的 age 屬性</p>
+                        <p><code>filter()</code> 會回傳一個新陣列，包含所有符合條件的元素。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第8題 -->
+        <div class="question-card" id="q8">
+            <div class="question-header">
+                <div class="question-number">8</div>
+                <div class="question-title">參數傳址陷阱：重新賦值 vs 修改</div>
+            </div>
+            <div class="question-content">
+                請問以下程式碼執行後，listA 與 listB 的內容分別是什麼？為什麼？
+                <div class="code-block" style="margin-top: 10px;">
+<span class="keyword">let</span> listA = [<span class="string">1</span>, <span class="string">2</span>];
+<span class="keyword">let</span> listB = [<span class="string">3</span>, <span class="string">4</span>];
+
+<span class="keyword">function</span> <span class="function">process</span>(a, b) {
+  a.<span class="function">push</span>(<span class="string">99</span>);
+  b = [<span class="string">100</span>];
+}
+<span class="function">process</span>(listA, listB);
+                </div>
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a8')">顯示解答與解析</button>
+                <div class="answer-content" id="a8">
+                    <div class="code-block">
+<span class="comment">// 執行後：</span>
+console.<span class="function">log</span>(listA); <span class="comment">// [1, 2, 99] - 被修改了！</span>
+console.<span class="function">log</span>(listB); <span class="comment">// [3, 4] - 維持原樣！</span>
+                </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p><strong>關鍵概念：傳址 vs 重新賦值</strong></p>
+                        <p><strong>listA 的情況：</strong><br>
+                        <code>a.push(99)</code> 直接修改了陣列內容。由於 JavaScript 的物件是傳址，<code>a</code> 和 <code>listA</code> 指向同一個陣列，所以原陣列被修改了。</p>
+                        <p><strong>listB 的情況：</strong><br>
+                        <code>b = [100]</code> 只是讓參數 <code>b</code> 指向一個新的陣列。這不會影響到外面的 <code>listB</code>，因為重新賦值並不會修改原變數的參照。</p>
+                        <p><strong>記憶口號：</strong>「修改」會影響外部，「重新賦值」不會！</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第9題 -->
+        <div class="question-card" id="q9">
+            <div class="question-header">
+                <div class="question-number">9</div>
+                <div class="question-title">延遲執行的 Callback</div>
+            </div>
+            <div class="question-content">
+                使用 setTimeout。要求在 2 秒後，利用箭頭函數印出陣列 ["Task", "Completed"] 中組合起來的字串 "Task Completed"。
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a9')">顯示解答與解析</button>
+                <div class="answer-content" id="a9">
+                    <div class="code-block">
+<span class="keyword">const</span> words = [<span class="string">"Task"</span>, <span class="string">"Completed"</span>];
+
+setTimeout(() => {
+  console.<span class="function">log</span>(words.<span class="function">join</span>(<span class="string">" "</span>)); <span class="comment">// 2秒後輸出: Task Completed</span>
+}, <span class="string">2000</span>);
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p><code>setTimeout</code> 是非同步操作的經典範例：<br>
+                        - 第一個參數：callback 函數<br>
+                        - 第二個參數：延遲時間（毫秒）</p>
+                        <p><code>join(" ")</code> 會將陣列元素用指定的分隔符串聯成字串。</p>
+                        <p><strong>重要：</strong>setTimeout 不會阻塞程式執行，程式碼會立即繼續執行下面的內容，而 callback 會在指定的延遲時間後才被執行。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第10題 -->
+        <div class="question-card" id="q10">
+            <div class="question-header">
+                <div class="question-number">10</div>
+                <div class="question-title">綜合應用：計算總價</div>
+            </div>
+            <div class="question-content">
+                寫一個函數 <code>calculateTotal(cart, discountFunc)</code>。
+                <br><br>
+                <ul>
+                    <li>cart 是一個數字陣列（商品價格）</li>
+                    <li>discountFunc 是一個處理折扣的 callback</li>
+                </ul>
+                <strong>任務：</strong>先將 cart 內所有數字相加，再將總和傳入 discountFunc 處理後回傳。
+                <br><br>
+                <strong>測試：</strong>傳入 [100, 200, 300] 並透過匿名函數扣除 50 元。
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a10')">顯示解答與解析</button>
+                <div class="answer-content" id="a10">
+                    <div class="code-block">
+<span class="keyword">function</span> <span class="function">calculateTotal</span>(cart, discountFunc) {
+  <span class="keyword">const</span> sum = cart.<span class="function">reduce</span>((acc, price) => acc + price, <span class="string">0</span>);
+  <span class="keyword">return</span> discountFunc(sum);
+}
+
+<span class="comment">// 測試：傳入 [100, 200, 300] 並扣除 50 元</span>
+<span class="keyword">const</span> total = <span class="function">calculateTotal</span>(
+  [<span class="string">100</span>, <span class="string">200</span>, <span class="string">300</span>],
+  (sum) => sum - <span class="string">50</span>
+);
+
+console.<span class="function">log</span>(total); <span class="comment">// 550</span>
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p>這是一個<strong>綜合應用題</strong>，結合了多個概念：</p>
+                        <p>1. <strong>reduce()</strong>：將陣列所有元素「歸納」成單一值（這裡是總和）<br>
+                        2. <strong>Callback</strong>：折扣邏輯由外部傳入，增加函數彈性<br>
+                        3. <strong>箭頭函數</strong>：簡潔地傳入折扣邏輯 <code>(sum) => sum - 50</code></p>
+                        <p>這種模式讓 <code>calculateTotal</code> 函數可以被重複利用，只需更換不同的折扣 callback 就能達到不同的優惠方式！</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="scrollToTop()" title="回到頂部">↑</button>
+        <button class="nav-btn" onclick="scrollToBottom()" title="到底部">↓</button>
+    </div>
+
+    <script>
+        function toggleAnswer(id) {
+            const content = document.getElementById(id);
+            content.classList.toggle('show');
+            
+            const btn = content.previousElementSibling;
+            btn.textContent = content.classList.contains('show') ? '隱藏解答' : '顯示解答與解析';
+            
+            updateProgress();
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function scrollToBottom() {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function updateProgress() {
+            const shown = document.querySelectorAll('.answer-content.show').length;
+            const total = 10;
+            const percentage = (shown / total) * 100;
+            document.getElementById('progressFill').style.width = percentage + '%';
+        }
+
+        window.addEventListener('scroll', () => {
+            const scrolled = window.scrollY;
+            const maxScroll = document.body.scrollHeight - window.innerHeight;
+            const percentage = (scrolled / maxScroll) * 100;
+            document.getElementById('progressFill').style.width = percentage + '%';
+        });
+    </script>
+</body>
+</html>
