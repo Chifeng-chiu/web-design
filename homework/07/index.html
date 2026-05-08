@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 練習 - 看懂 Blog 網誌範例的關鍵</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .question-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .question-header { display: flex; align-items: center; margin-bottom: 15px; }
+        .question-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .question-title { font-size: 1.2em; color: #333; font-weight: 600; }
+        .target { background: #e8f5e9; padding: 12px; border-radius: 8px; margin: 15px 0; }
+        .target strong { color: #2e7d32; }
+        .question-content { background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; line-height: 1.8; color: #444; }
+        .question-content ul { margin: 10px 0; padding-left: 20px; }
+        .note { background: #fff3e0; padding: 12px; border-radius: 8px; margin: 15px 0; }
+        .note strong { color: #e65100; }
+        .answer-section { margin-top: 15px; }
+        .toggle-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+        .toggle-btn:hover { background: #218838; }
+        .answer-content {
+            display: none;
+            margin-top: 15px;
+            padding: 20px;
+            background: #e8f5e9;
+            border-left: 4px solid #28a745;
+            border-radius: 0 10px 10px 0;
+        }
+        .answer-content.show { display: block; }
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        .code-block .comment { color: #6a9955; }
+        .code-block .keyword { color: #c586c0; }
+        .code-block .string { color: #ce9178; }
+        .code-block .function { color: #dcdcaa; }
+        .analysis {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .analysis h4 { color: #e65100; margin-bottom: 10px; }
+        .nav-buttons {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .nav-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        .nav-btn:hover { background: #667eea; color: white; }
+        .progress-bar { position: fixed; top: 0; left: 0; width: 100%; height: 5px; background: rgba(255,255,255,0.3); }
+        .progress-fill { height: 100%; background: white; transition: width 0.3s; }
+        .guide { background: #e3f2fd; padding: 20px; border-radius: 15px; margin-top: 30px; }
+        .guide h3 { color: #1565c0; margin-bottom: 15px; }
+        .guide ul { padding-left: 20px; line-height: 2; }
+    </style>
+</head>
+<body>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    
+    <div class="container">
+        <h1>全方位 JavaScript 實作挑戰：從基礎到後端邏輯</h1>
+
+        <div class="question-card" id="q1">
+            <div class="question-header">
+                <div class="question-number">1</div>
+                <div class="question-title">物件屬性存取 (Object Property Access)</div>
+            </div>
+            <div class="target"><strong>目標：</strong>理解 post.title 的運作。</div>
+            <div class="question-content">
+                <strong>題目：</strong>宣告一個名為 post 的物件，包含 id: 1、title: "Hello World" 和 content: "Markdown content"。請練習用兩種方式印出 title：點符號 (Dot notation) 與中括號 (Bracket notation)。
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a1')">顯示解答</button>
+                <div class="answer-content" id="a1">
+                    <div class="code-block">
+<span class="keyword">const</span> post = { id: <span class="string">1</span>, title: <span class="string">"Hello World"</span>, content: <span class="string">"Markdown content"</span> };
+console.<span class="function">log</span>(<span class="string">"Dot notation:"</span>, post.title);
+console.<span class="function">log</span>(<span class="string">"Bracket notation:"</span>, post[<span class="string">"title"</span>]);
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p>• Dot notation: <code>post.title</code> - 最直觀的寫法</p>
+                        <p>• Bracket notation: <code>post["title"]</code> - 可使用變數動態存取</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-card" id="q2">
+            <div class="question-header">
+                <div class="question-number">2</div>
+                <div class="question-title">物件解構賦值 (Object Destructuring)</div>
+            </div>
+            <div class="target"><strong>目標：</strong>理解程式中 <code>const { title, content } = req.body;</code> 的寫法。</div>
+            <div class="question-content">
+                <strong>題目：</strong>假設有一個變數 req 內容如下：<br>
+                <code>const req = { body: { title: "JS教學", content: "內容在此", author: "Gemini" } };</code><br><br>
+                請用一行程式碼從 req.body 中取出 title 和 content 並宣告為同名常數。
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a2')">顯示解答</button>
+                <div class="answer-content" id="a2">
+                    <div class="code-block">
+<span class="keyword">const</span> req = { body: { title: <span class="string">"JS教學"</span>, content: <span class="string">"內容在此"</span>, author: <span class="string">"Gemini"</span> } };
+<span class="keyword">const</span> { title, content } = req.body;
+console.<span class="function">log</span>(title, content); <span class="comment">// JS教學 內容在此</span>
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p>解構賦值可以快速從物件中取出多個屬性並宣告為變數。<code>{ title, content }</code> 等同於 <code>{ title: title, content: content }</code>。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-card" id="q3">
+            <div class="question-header">
+                <div class="question-number">3</div>
+                <div class="question-title">陣列的遍歷與字串拼接 (Array forEach & Template Literals)</div>
+            </div>
+            <div class="target"><strong>目標：</strong>理解部落格首頁如何產生文章列表。</div>
+            <div class="question-content">
+                <strong>題目：</strong>給定一個陣列 <code>const posts = [{id: 1, t: "A"}, {id: 2, t: "B"}]</code>。請宣告一個空字串 <code>let html = ""</code>，並使用 forEach 遍歷陣列，將每個物件轉為 <code>&lt;div&gt;A&lt;/div&gt;</code> 的格式拼接到 html 中。
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a3')">顯示解答</button>
+                <div class="answer-content" id="a3">
+                    <div class="code-block">
+<span class="keyword">const</span> posts = [{id: <span class="string">1</span>, t: <span class="string">"A"</span>}, {id: <span class="string">2</span>, t: <span class="string">"B"</span>}];
+<span class="keyword">let</span> html = <span class="string">""</span>;
+posts.<span class="function">forEach</span>(p => { html += <span class="string">`&lt;div&gt;</span>${p.t}<span class="string">&lt;/div&gt;</span>`; });
+console.<span class="function">log</span>(html); <span class="comment">// &lt;div&gt;A&lt;/div&gt;&lt;div&gt;B&lt;/div&gt;</span>
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p>使用模板字串（反引號）可以方便地嵌入變數。<code>${p.t}</code> 會動態替換成實際值。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-card" id="q4">
+            <div class="question-header">
+                <div class="question-number">4</div>
+                <div class="question-title">字典與動態參數 (URL Params / Dictionary)</div>
+            </div>
+            <div class="target"><strong>目標：</strong>理解 req.params.id 的來源。</div>
+            <div class="question-content">
+                <strong>題目：</strong>建立一個名為 params 的物件（字典），模擬 URL 參數。請動態新增一個鍵為 "id"，值為 99 的屬性，然後印出這個物件。
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a4')">顯示解答</button>
+                <div class="answer-content" id="a4">
+                    <div class="code-block">
+<span class="keyword">const</span> params = {};
+params[<span class="string">"id"</span>] = <span class="string">99</span>;
+console.<span class="function">log</span>(params); <span class="comment">// { id: 99 }</span>
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p>JavaScript 物件本質上就是字典（key-value 儲存）。可以使用 <code>物件["鍵"] = 值</code> 動態新增屬性。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-card" id="q5">
+            <div class="question-header">
+                <div class="question-number">5</div>
+                <div class="question-title">Callback 函數傳參 (Error-First Callback)</div>
+            </div>
+            <div class="target"><strong>目標：</strong>理解 getPost(id, callback) 的非同步設計。</div>
+            <div class="question-content">
+                <strong>題目：</strong>撰寫一個函數 fetchData(id, callback)。
+                <ul>
+                    <li>邏輯：在函數內宣告一個物件 <code>{ id: id, status: "success" }</code>。</li>
+                    <li>執行：呼叫 callback 並將 null (代表錯誤) 與該物件傳進去。</li>
+                </ul>
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a5')">顯示解答</button>
+                <div class="answer-content" id="a5">
+                    <div class="code-block">
+<span class="keyword">function</span> <span class="function">fetchData</span>(id, callback) {
+    <span class="keyword">const</span> fakeData = { id: id, status: <span class="string">"success"</span> };
+    callback(<span class="keyword">null</span>, fakeData);
+}
+
+<span class="function">fetchData</span>(<span class="string">101</span>, (err, data) => {
+    <span class="keyword">if</span> (err) console.<span class="function">log</span>(<span class="string">"發生錯誤："</span> + err);
+    <span class="keyword">else</span> console.<span class="function">log</span>(<span class="string">"成功取得資料："</span>, data);
+});
+                    </div>
+                    <div class="note">
+                        <strong>提示：</strong>依照 Node.js 慣例，Callback 的第一個參數是用來放「錯誤訊息」的。如果沒有錯誤，就放 null。
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p>這是 Node.js 的「錯誤優先回呼」(Error-First Callback) 模式：<br>
+                        1. 第一個參數：錯誤（沒錯就傳 null）<br>
+                        2. 第二個參數：實際資料</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-card" id="q6">
+            <div class="question-header">
+                <div class="question-number">6</div>
+                <div class="question-title">JSON 處理 (Parsing JSON)</div>
+            </div>
+            <div class="target"><strong>目標：</strong>理解 <code>app.use(express.json())</code> 在處理什麼。</div>
+            <div class="question-content">
+                <strong>題目：</strong>給定一個 JSON 字串 <code>const jsonStr = '{"title": "Post 1", "tags": ["js", "node"]}'</code>。請將它轉換成 JavaScript 物件，並印出 tags 陣列中的第二個元素。
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a6')">顯示解答</button>
+                <div class="answer-content" id="a6">
+                    <div class="code-block">
+<span class="keyword">const</span> jsonStr = <span class="string">'{"title": "Post 1", "tags": ["js", "node"]}'</span>;
+<span class="keyword">const</span> obj = JSON.<span class="function">parse</span>(jsonStr);
+console.<span class="function">log</span>(obj.tags[<span class="string">1</span>]); <span class="comment">// node</span>
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p><code>JSON.parse()</code> 將 JSON 字串轉換為 JavaScript 物件。<code>express.json()</code> 底層就是做這個轉換，讓我們能用 <code>req.body</code> 取得解析後的物件。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-card" id="q7">
+            <div class="question-header">
+                <div class="question-number">7</div>
+                <div class="question-title">模擬資料庫查詢 (Simulating DB Queries)</div>
+            </div>
+            <div class="target"><strong>目標：</strong>理解 db.get 的結構。</div>
+            <div class="question-content">
+                <strong>題目：</strong>寫一個函數 fakeGet(sql, params, callback)。
+                <ul>
+                    <li>內部邏輯：不管 SQL 是什麼，直接呼叫 callback(null, { title: "Fake Title" })。</li>
+                    <li>測試：呼叫這個函數，並在回呼函數中印出標題。</li>
+                </ul>
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a7')">顯示解答</button>
+                <div class="answer-content" id="a7">
+                    <div class="code-block">
+<span class="keyword">function</span> <span class="function">fakeGet</span>(sql, params, callback) {
+    callback(<span class="keyword">null</span>, { id: <span class="string">1</span>, title: <span class="string">"掌握 JavaScript 函數"</span>, content: <span class="string">"..."</span> });
+}
+
+<span class="keyword">const</span> query = <span class="string">"SELECT * FROM posts WHERE id = ?"</span>;
+<span class="keyword">const</span> inputParams = [<span class="string">1</span>];
+
+fakeGet(query, inputParams, (err, row) => {
+    <span class="keyword">if</span> (err) console.<span class="function">error</span>(<span class="string">"查詢失敗"</span>);
+    <span class="keyword">else</span> console.<span class="function">log</span>(<span class="string">"抓到的文章標題是："</span>, row.title);
+});
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p>這模擬了 SQLite3 的 <code>db.get(sql, params, callback)</code> API。Callback 格式：(err, row) => { ... }</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-card" id="q8">
+            <div class="question-header">
+                <div class="question-number">8</div>
+                <div class="question-title">樣板字串中的邏輯運算 (Template Literals with Logic)</div>
+            </div>
+            <div class="target"><strong>目標：</strong>理解網頁 HTML 模板的產生。</div>
+            <div class="question-content">
+                <strong>題目：</strong>宣告變數 <code>user = "Guest"</code>。請使用「反引號 (`)」建立一個 HTML 字串，內容為 <code>&lt;h1&gt;Welcome, ${...}&lt;/h1&gt;</code>，其中 ${} 內要判斷：如果 user 有值就顯示 user，否則顯示 "Stranger"。
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a8')">顯示解答</button>
+                <div class="answer-content" id="a8">
+                    <div class="code-block">
+<span class="keyword">const</span> user = <span class="string">"Guest"</span>;
+<span class="keyword">const</span> html = <span class="string">`&lt;h1&gt;Welcome, </span>${user || <span class="string">"Stranger"</span>}<span class="string">&lt;/h1&gt;`</span>;
+console.<span class="function">log</span>(html); <span class="comment">// &lt;h1&gt;Welcome, Guest&lt;/h1&gt;</span>
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p>使用 <code>||</code> 運算子在模板字串中做三元運算：user 有值就用 user，否則用 "Stranger"。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-card" id="q9">
+            <div class="question-header">
+                <div class="question-number">9</div>
+                <div class="question-title">陣列物件的排序與切片 (Sort & Substring)</div>
+            </div>
+            <div class="target"><strong>目標：</strong>理解 SQL 語法在 JS 端的預習邏輯（例如 ORDER BY, substr）。</div>
+            <div class="question-content">
+                <strong>題目：</strong>給定一個陣列 <code>["Very long content here", "Another Very long content here", "3rd Very long content here"]</code>。請取出這個字串的前 10 個字元，並在後方加上 "..."。
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a9')">顯示解答</button>
+                <div class="answer-content" id="a9">
+                    <div class="code-block">
+<span class="keyword">const</span> arr = [<span class="string">"Very long content here"</span>, <span class="string">"Another Very long content here"</span>, <span class="string">"3rd Very long content here"</span>];
+<span class="keyword">const</span> result = arr.<span class="function">map</span>(s => s.<span class="function">substring</span>(<span class="string">0</span>, <span class="string">10</span>) + <span class="string">"..."</span>);
+console.<span class="function">log</span>(result);
+<span class="comment">// ["Very long...", "Another Ve...", "3rd Very l..."]</span>
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p><code>substring(0, 10)</code> 取出字串的 0 到 9 位置（共 10 個字元）。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-card" id="q10">
+            <div class="question-header">
+                <div class="question-number">10</div>
+                <div class="question-title">錯誤優先回呼模式 (Error-First Callback Pattern)</div>
+            </div>
+            <div class="target"><strong>目標：</strong>理解程式中不斷出現的 <code>if (err) return ...</code>。</div>
+            <div class="question-content">
+                <strong>題目：</strong>寫一個函數 checkAdmin(role, callback)。
+                <ul>
+                    <li>如果 role 不是 "admin"，呼叫 callback("Access Denied")。</li>
+                    <li>如果是 "admin"，呼叫 callback(null, "Welcome")。</li>
+                </ul>
+                <p>測試：練習呼叫此函數並處理有錯誤與沒錯誤的兩種狀況。</p>
+            </div>
+            <div class="answer-section">
+                <button class="toggle-btn" onclick="toggleAnswer('a10')">顯示解答</button>
+                <div class="answer-content" id="a10">
+                    <div class="code-block">
+<span class="keyword">function</span> <span class="function">checkAdmin</span>(role, callback) {
+    <span class="keyword">if</span> (role !== <span class="string">"admin"</span>) callback(<span class="string">"Access Denied"</span>);
+    <span class="keyword">else</span> callback(<span class="keyword">null</span>, <span class="string">"Welcome"</span>);
+}
+
+<span class="function">checkAdmin</span>(<span class="string">"user"</span>, (err, msg) => { console.<span class="function">log</span>(err || msg); });
+<span class="function">checkAdmin</span>(<span class="string">"admin"</span>, (err, msg) => { console.<span class="function">log</span>(err || msg); });
+<span class="comment">// Output: Access Denied, Welcome</span>
+                    </div>
+                    <div class="analysis">
+                        <h4>解析</h4>
+                        <p>錯誤優先模式：先檢查 err，有錯誤就處理錯誤，沒錯誤才處理資料。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="guide">
+            <h3>給學生的引導建議</h3>
+            <p>做完這十題後，可以帶著學生重新閱讀你的部落格原始碼：</p>
+            <ul>
+                <li>第 10 題 → 對應到所有 db.xxx 的 (err, row) => { ... } 結構</li>
+                <li>第 2 題 → 對應到 app.post('/posts') 內取出表單資料的動作</li>
+                <li>第 3 題 → 對應到首頁 posts.forEach 產生文章列表的迴圈</li>
+                <li>第 8 題 → 對應到整個 let html = ...`` 的動態網頁產生過程</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="scrollToTop()">↑</button>
+        <button class="nav-btn" onclick="scrollToBottom()">↓</button>
+    </div>
+
+    <script>
+        function toggleAnswer(id) {
+            const content = document.getElementById(id);
+            content.classList.toggle('show');
+            const btn = content.previousElementSibling;
+            btn.textContent = content.classList.contains('show') ? '隱藏解答' : '顯示解答';
+            updateProgress();
+        }
+        function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function scrollToBottom() { window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }
+        function updateProgress() {
+            const shown = document.querySelectorAll('.answer-content.show').length;
+            document.getElementById('progressFill').style.width = (shown / 10 * 100) + '%';
+        }
+        window.addEventListener('scroll', () => {
+            const percentage = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+            document.getElementById('progressFill').style.width = percentage + '%';
+        });
+    </script>
+</body>
+</html>
