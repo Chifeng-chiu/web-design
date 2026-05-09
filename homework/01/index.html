@@ -91,13 +91,16 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      text-decoration: none;
       transition: all 0.3s ease;
-      cursor: default;
     }
     .interest-tag:hover {
       background: rgba(245, 87, 108, 0.25);
       border-color: #f5576c;
       transform: scale(1.05);
+    }
+    a.interest-tag {
+      color: #fff;
     }
     .interest-icon {
       font-size: 22px;
@@ -118,15 +121,15 @@
     <div class="divider"></div>
     <p class="section-title">興趣</p>
     <div class="interests">
-      <div class="interest-tag">
-        <span class="interest-icon">🏀</span> 打籃球
-      </div>
-      <div class="interest-tag">
+      <a href="gallery.html?category=sports" class="interest-tag">
+        <span class="interest-icon">🏀</span> 運動
+      </a>
+      <a href="gallery.html?category=photography" class="interest-tag">
         <span class="interest-icon">📷</span> 攝影
-      </div>
-      <div class="interest-tag">
+      </a>
+      <a href="gallery.html?category=travel" class="interest-tag">
         <span class="interest-icon">✈️</span> 旅遊
-      </div>
+      </a>
     </div>
     <p class="footer">歡迎來到我的個人網頁</p>
   </div>
