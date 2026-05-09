@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的部落格</title>
+  <link rel="stylesheet" href="public/css/style.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>我的部落格</h1>
+      <form class="search-bar" onsubmit="alert('搜尋功能：' + this.q.value); return false;">
+        <input type="text" name="q" placeholder="搜尋文章...">
+        <button type="submit">🔍</button>
+      </form>
+      <nav>
+        <ul>
+          <li><a href="/login" class="btn btn-outline">登入</a></li>
+          <li><a href="/register" class="btn">註冊</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h3>📂 文章分類</h3>
+        <ul class="category-list">
+          <li><a href="#" class="active">全部文章</a></li>
+          <li><a href="#">💕 感情</a></li>
+          <li><a href="#">💼 事業</a></li>
+          <li><a href="#">📚 學習</a></li>
+          <li><a href="#">🌿 生活</a></li>
+          <li><a href="#">🎯 興趣</a></li>
+          <li><a href="#">🏥 健康</a></li>
+          <li><a href="#">💰 理財</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="hero">
+        <h2>歡迎來到我的部落格</h2>
+        <p>分享您的想法、故事和創意</p>
+      </div>
+
+      <div class="posts-grid">
+        <article class="post-card">
+          <span class="category-tag">生活</span>
+          <div class="post-card-header">
+            <h3><a href="#">如何開始寫部落格</a></h3>
+            <p class="meta">
+              <span>👤 作者</span>
+              <span>📅 2026/5/9</span>
+            </p>
+          </div>
+          <div class="post-card-body">
+            <p class="excerpt">寫部落格是一個很好的習慣，可以幫助你整理思緒、分享知識，還能記錄生活中的點點滴滴...</p>
+          </div>
+          <div class="post-card-footer">
+            <a href="#" class="read-more">閱讀更多 →</a>
+          </div>
+        </article>
+
+        <article class="post-card">
+          <span class="category-tag">學習</span>
+          <div class="post-card-header">
+            <h3><a href="#">HTML & CSS 入門指南</a></h3>
+            <p class="meta">
+              <span>👤 作者</span>
+              <span>📅 2026/5/8</span>
+            </p>
+          </div>
+          <div class="post-card-body">
+            <p class="excerpt">網頁開發的第一步就是學會 HTML 和 CSS，這篇文章將帶你從零開始建立第一個網頁...</p>
+          </div>
+          <div class="post-card-footer">
+            <a href="#" class="read-more">閱讀更多 →</a>
+          </div>
+        </article>
+
+        <article class="post-card">
+          <span class="category-tag">興趣</span>
+          <div class="post-card-header">
+            <h3><a href="#">攝影新手必備技巧</a></h3>
+            <p class="meta">
+              <span>👤 作者</span>
+              <span>📅 2026/5/7</span>
+            </p>
+          </div>
+          <div class="post-card-body">
+            <p class="excerpt">想要拍出好看的照片其實不難，掌握幾個基本技巧就能讓你的照片水準大幅提升...</p>
+          </div>
+          <div class="post-card-footer">
+            <a href="#" class="read-more">閱讀更多 →</a>
+          </div>
+        </article>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 我的部落格. All rights reserved.</p>
+  </footer>
+</body>
+</html>
