@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaScript 學習練習</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #e2e8f0; padding: 2rem; }
+  h1 { text-align: center; font-size: 2rem; margin-bottom: 2rem; background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 1.5rem; max-width: 1600px; margin: 0 auto; }
+  .card { background: #1e293b; border-radius: 1rem; padding: 1.5rem; border: 1px solid #334155; box-shadow: 0 4px 6px -1px rgba(0,0,0,.3); }
+  .card h2 { font-size: 1.1rem; margin-bottom: 1rem; color: #38bdf8; display: flex; align-items: center; gap: .5rem; }
+  .card h2 .num { color: #64748b; font-size: .85rem; }
+  .input-group { display: flex; gap: .5rem; margin-bottom: .75rem; flex-wrap: wrap; }
+  .input-group input, .input-group select { flex: 1; min-width: 120px; padding: .5rem .75rem; border-radius: .5rem; border: 1px solid #475569; background: #0f172a; color: #e2e8f0; font-size: .9rem; outline: none; transition: border .2s; }
+  .input-group input:focus, .input-group select:focus { border-color: #38bdf8; }
+  .btn { padding: .5rem 1rem; border-radius: .5rem; border: none; cursor: pointer; font-size: .9rem; font-weight: 600; transition: all .2s; }
+  .btn-primary { background: #38bdf8; color: #0f172a; }
+  .btn-primary:hover { background: #7dd3fc; }
+  .btn-success { background: #22c55e; color: #0f172a; }
+  .btn-success:hover { background: #4ade80; }
+  .btn-warning { background: #eab308; color: #0f172a; }
+  .btn-warning:hover { background: #fde047; }
+  .btn-danger { background: #ef4444; color: #fff; }
+  .btn-danger:hover { background: #f87171; }
+  .output { background: #0f172a; border-radius: .5rem; padding: .75rem; margin-top: .5rem; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: .85rem; min-height: 2.5rem; border: 1px solid #334155; white-space: pre-wrap; word-break: break-all; }
+  .output .pass { color: #22c55e; }
+  .output .fail { color: #ef4444; }
+  .output .info { color: #94a3b8; }
+  .tag { display: inline-block; padding: .15rem .5rem; border-radius: 999px; font-size: .75rem; font-weight: 600; margin-left: .5rem; background: #334155; color: #94a3b8; }
+  .code-block { background: #0f172a; border-radius: .5rem; padding: .75rem; margin-bottom: .75rem; border: 1px solid #334155; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: .8rem; color: #a5b4fc; line-height: 1.6; overflow-x: auto; }
+  .fullwidth { grid-column: 1 / -1; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th, td { padding: .5rem .75rem; text-align: left; border-bottom: 1px solid #334155; }
+  th { color: #94a3b8; font-weight: 600; background: #0f172a; }
+  .cart-summary { display: flex; gap: 1rem; justify-content: space-between; flex-wrap: wrap; margin-top: .75rem; }
+  .cart-stat { background: #0f172a; padding: .75rem 1rem; border-radius: .5rem; flex: 1; min-width: 100px; text-align: center; border: 1px solid #334155; }
+  .cart-stat .label { font-size: .75rem; color: #94a3b8; }
+  .cart-stat .value { font-size: 1.2rem; font-weight: 700; color: #38bdf8; }
+  .text-right { text-align: right; }
+  .text-muted { color: #64748b; }
+  .mt-1 { margin-top: .75rem; }
+</style>
+</head>
+<body>
+<h1>JS 學習練習</h1>
+<div class="grid">
+
+  <!-- 1. 判斷奇偶 -->
+  <div class="card">
+    <h2><span class="num">01</span> 判斷奇偶</h2>
+    <div class="code-block">function isEven(n) { return n % 2 === 0; }</div>
+    <div class="input-group">
+      <input type="number" id="even-input" value="7" step="1">
+      <button class="btn btn-primary" onclick="checkEven()">判斷</button>
+    </div>
+    <div class="output" id="even-output">請輸入數字後點擊判斷</div>
+  </div>
+
+  <!-- 2. 陣列求和 -->
+  <div class="card">
+    <h2><span class="num">02</span> 陣列求和</h2>
+    <div class="code-block">const sum = arr => arr.reduce((a, b) => a + b, 0);</div>
+    <div class="input-group">
+      <input type="text" id="sum-input" value="1,2,3,4,5" placeholder="逗號分隔數字">
+      <button class="btn btn-primary" onclick="calcSum()">計算</button>
+    </div>
+    <div class="output" id="sum-output">請輸入陣列後點擊計算</div>
+  </div>
+
+  <!-- 3. 尋找大於目標的最小 2 的次方數 -->
+  <div class="card">
+    <h2><span class="num">03</span> &gt;目標的最小 2 次方</h2>
+    <div class="code-block">function nextPow2(n) { return Math.pow(2, Math.ceil(Math.log2(n))); }</div>
+    <div class="input-group">
+      <input type="number" id="pow2-input" value="50" step="1" min="1">
+      <button class="btn btn-primary" onclick="findNextPow2()">尋找</button>
+    </div>
+    <div class="output" id="pow2-output">請輸入數字後點擊尋找</div>
+  </div>
+
+  <!-- 4. 物件屬性讀取 -->
+  <div class="card">
+    <h2><span class="num">04</span> 物件屬性讀取</h2>
+    <div class="code-block">user.name  // 點記法<br>user["name"] // 括號記法</div>
+    <div class="input-group">
+      <select id="prop-select">
+        <option value="name">name</option>
+        <option value="age">age</option>
+        <option value="city">city</option>
+        <option value="job">job</option>
+      </select>
+      <button class="btn btn-primary" onclick="readProp()">讀取</button>
+    </div>
+    <div class="output" id="prop-output">請選擇屬性後點擊讀取</div>
+  </div>
+
+  <!-- 5. JSON 解析與字串化 -->
+  <div class="card">
+    <h2><span class="num">05</span> JSON 解析與字串化</h2>
+    <div class="code-block">JSON.parse(str) → 物件<br>JSON.stringify(obj) → 字串</div>
+    <div class="input-group">
+      <button class="btn btn-success" onclick="doParse()">解析</button>
+      <button class="btn btn-warning" onclick="doStringify()">字串化</button>
+    </div>
+    <div class="output" id="json-output">點擊按鈕操作 JSON</div>
+  </div>
+
+  <!-- 6. 陣列過濾 -->
+  <div class="card">
+    <h2><span class="num">06</span> 陣列過濾</h2>
+    <div class="code-block">arr.filter(n => n &gt; 10)</div>
+    <div class="input-group">
+      <input type="text" id="filter-input" value="3,15,8,22,1,17,6,30" placeholder="逗號分隔數字">
+      <input type="number" id="filter-threshold" value="10" placeholder="閾值" style="min-width:80px;flex:0 1 80px;">
+      <button class="btn btn-primary" onclick="doFilter()">過濾</button>
+    </div>
+    <div class="output" id="filter-output">請輸入陣列後點擊過濾</div>
+  </div>
+
+  <!-- 7. 字母頻率統計 -->
+  <div class="card">
+    <h2><span class="num">07</span> 字母頻率統計</h2>
+    <div class="code-block">const freq = {};<br>for (const ch of str) freq[ch] = (freq[ch]||0) + 1;</div>
+    <div class="input-group">
+      <input type="text" id="freq-input" value="hello world" placeholder="輸入文字">
+      <button class="btn btn-primary" onclick="calcFreq()">統計</button>
+    </div>
+    <div class="output" id="freq-output">請輸入文字後點擊統計</div>
+  </div>
+
+  <!-- 8. 陣列反轉 (手動演算法版) -->
+  <div class="card">
+    <h2><span class="num">08</span> 陣列反轉 <span class="tag">手動演算法</span></h2>
+    <div class="code-block">for (let i = 0; i &lt; n/2; i++) {<br>  [arr[i], arr[n-1-i]] = [arr[n-1-i], arr[i]];<br>}</div>
+    <div class="input-group">
+      <input type="text" id="reverse-input" value="A,B,C,D,E" placeholder="逗號分隔">
+      <button class="btn btn-primary" onclick="doReverse()">反轉</button>
+    </div>
+    <div class="output" id="reverse-output">請輸入陣列後點擊反轉</div>
+  </div>
+
+  <!-- 9. JSON 物件陣列尋找最高分 -->
+  <div class="card">
+    <h2><span class="num">09</span> 尋找最高分</h2>
+    <div class="code-block">students.reduce((max, s) => s.score > max.score ? s : max)</div>
+    <div class="input-group">
+      <button class="btn btn-primary" onclick="findTop()">尋找最高分</button>
+    </div>
+    <div class="output" id="top-output">點擊按鈕尋找最高分學生</div>
+  </div>
+
+  <!-- 10. 綜合挑戰：購物車動態結帳模擬 -->
+  <div class="card fullwidth">
+    <h2><span class="num">10</span> 綜合挑戰：購物車動態結帳模擬</h2>
+    <div class="code-block">// 購物車包含：商品名稱、單價、數量、折扣<br>// 功能：新增商品、計算小計/折扣/稅金/總額、結帳</div>
+    <div class="input-group">
+      <input type="text" id="cart-name" value="商品A" placeholder="商品名稱" style="flex:1;">
+      <input type="number" id="cart-price" value="100" placeholder="單價" style="flex:0 1 90px;" min="0">
+      <input type="number" id="cart-qty" value="2" placeholder="數量" style="flex:0 1 70px;" min="1">
+      <input type="number" id="cart-discount" value="10" placeholder="折扣%" style="flex:0 1 80px;" min="0" max="100">
+      <button class="btn btn-success" onclick="addItem()">新增</button>
+      <button class="btn btn-warning" onclick="checkout()">結帳</button>
+      <button class="btn btn-danger" onclick="clearCart()">清空</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr><th>商品</th><th class="text-right">單價</th><th class="text-right">數量</th><th class="text-right">折扣%</th><th class="text-right">小計</th><th></th></tr></thead>
+        <tbody id="cart-body"><tr><td colspan="6" class="text-muted" style="text-align:center;">購物車是空的</td></tr></tbody>
+      </table>
+    </div>
+    <div class="cart-summary">
+      <div class="cart-stat"><div class="label">商品種類</div><div class="value" id="cart-count">0</div></div>
+      <div class="cart-stat"><div class="label">折扣總額</div><div class="value" id="cart-discount-total">$0</div></div>
+      <div class="cart-stat"><div class="label">稅金 (5%)</div><div class="value" id="cart-tax">$0</div></div>
+      <div class="cart-stat"><div class="label">應付總額</div><div class="value" id="cart-total">$0</div></div>
+    </div>
+    <div class="output" id="cart-output">使用上方表單新增商品到購物車</div>
+  </div>
+</div>
+
+<script>
+// ==============================
+// 1. 判斷奇偶
+// ==============================
+function isEven(n) { return n % 2 === 0; }
+
+function checkEven() {
+  const val = parseInt(document.getElementById('even-input').value);
+  const out = document.getElementById('even-output');
+  if (isNaN(val)) { out.textContent = '請輸入有效數字'; return; }
+  out.innerHTML = `<span class="${isEven(val) ? 'pass' : 'fail'}">${val}</span> 是 <span class="${isEven(val) ? 'pass' : 'fail'}">${isEven(val) ? '偶數' : '奇數'}</span>`;
+}
+
+// ==============================
+// 2. 陣列求和
+// ==============================
+function calcSum() {
+  const raw = document.getElementById('sum-input').value;
+  const out = document.getElementById('sum-output');
+  const arr = raw.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+  if (!arr.length) { out.textContent = '請輸入有效的數字陣列'; return; }
+  const sum = arr.reduce((a, b) => a + b, 0);
+  out.innerHTML = `[${arr.join(', ')}] 總和 = <span class="pass">${sum}</span>`;
+}
+
+// ==============================
+// 3. 尋找大於目標的最小 2 次方
+// ==============================
+function nextPow2(n) {
+  if (n <= 0) return 1;
+  return Math.pow(2, Math.ceil(Math.log2(n)));
+}
+
+function findNextPow2() {
+  const val = parseInt(document.getElementById('pow2-input').value);
+  const out = document.getElementById('pow2-output');
+  if (isNaN(val) || val < 1) { out.textContent = '請輸入大於 0 的整數'; return; }
+  const result = nextPow2(val);
+  out.innerHTML = `大於 ${val} 的最小 2 的次方數 = <span class="pass">${result}</span> (2^${Math.round(Math.log2(result))})`;
+}
+
+// ==============================
+// 4. 物件屬性讀取
+// ==============================
+const user = { name: 'Alice', age: 28, city: '台北', job: '工程師' };
+
+function readProp() {
+  const key = document.getElementById('prop-select').value;
+  const out = document.getElementById('prop-output');
+  out.innerHTML = `user.${key} = <span class="pass">${user[key]}</span> (類型: ${typeof user[key]})`;
+}
+
+// ==============================
+// 5. JSON 解析與字串化
+// ==============================
+const sampleJSON = '{"name":"Bob","age":25,"skills":["JS","Python","SQL"]}';
+const sampleObj = { product: '滑鼠', price: 350, stock: true };
+
+function doParse() {
+  const out = document.getElementById('json-output');
+  try {
+    const obj = JSON.parse(sampleJSON);
+    out.innerHTML = `解析後得到物件：<br>name: <span class="pass">${obj.name}</span>, age: <span class="pass">${obj.age}</span>, skills: <span class="pass">[${obj.skills.join(', ')}]</span>`;
+  } catch (e) {
+    out.innerHTML = `<span class="fail">解析失敗：${e.message}</span>`;
+  }
+}
+
+function doStringify() {
+  const out = document.getElementById('json-output');
+  const str = JSON.stringify(sampleObj, null, 2);
+  out.innerHTML = `字串化結果：<br><span class="pass">${str.replace(/\n/g, '<br>').replace(/ /g, '&nbsp;')}</span>`;
+}
+
+// ==============================
+// 6. 陣列過濾
+// ==============================
+function doFilter() {
+  const raw = document.getElementById('filter-input').value;
+  const threshold = parseFloat(document.getElementById('filter-threshold').value);
+  const out = document.getElementById('filter-output');
+  const arr = raw.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+  if (!arr.length) { out.textContent = '請輸入有效的數字陣列'; return; }
+  const filtered = arr.filter(n => n > threshold);
+  out.innerHTML = `原始: [${arr.join(', ')}]<br>大於 ${threshold}: [<span class="pass">${filtered.join(', ')}</span>] (${filtered.length}/${arr.length} 個)`;
+}
+
+// ==============================
+// 7. 字母頻率統計
+// ==============================
+function calcFreq() {
+  const text = document.getElementById('freq-input').value;
+  const out = document.getElementById('freq-output');
+  if (!text) { out.textContent = '請輸入文字'; return; }
+  const freq = {};
+  for (const ch of text) {
+    if (ch === ' ') continue;
+    freq[ch] = (freq[ch] || 0) + 1;
+  }
+  const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+  const maxCount = sorted[0][1];
+  const bar = n => '█'.repeat(Math.round(n / maxCount * 20));
+  out.innerHTML = sorted.map(([ch, count]) =>
+    `'${ch}': ${String(count).padStart(2)} ${bar(count)}`
+  ).join('<br>');
+}
+
+// ==============================
+// 8. 陣列反轉 (手動演算法)
+// ==============================
+function doReverse() {
+  const raw = document.getElementById('reverse-input').value;
+  const out = document.getElementById('reverse-output');
+  const arr = raw.split(',').map(s => s.trim());
+  if (arr.length < 2) { out.textContent = '請輸入至少 2 個元素'; return; }
+  const original = [...arr];
+  const n = arr.length;
+  for (let i = 0; i < n / 2; i++) {
+    [arr[i], arr[n - 1 - i]] = [arr[n - 1 - i], arr[i]];
+  }
+  out.innerHTML = `原始: [${original.join(', ')}]<br>反轉: [<span class="pass">${arr.join(', ')}</span>]`;
+}
+
+// ==============================
+// 9. JSON 物件陣列尋找最高分
+// ==============================
+const students = [
+  { name: '小明', score: 85, class: 'A' },
+  { name: '小華', score: 92, class: 'B' },
+  { name: '小美', score: 78, class: 'A' },
+  { name: '小強', score: 95, class: 'B' },
+  { name: '小莉', score: 88, class: 'A' },
+];
+
+function findTop() {
+  const out = document.getElementById('top-output');
+  if (!students.length) { out.textContent = '學生列表為空'; return; }
+  const top = students.reduce((max, s) => s.score > max.score ? s : max);
+  out.innerHTML = students.map(s =>
+    `${s.name} ${s.score}分`
+  ).join(' | ') + '<br><br>';
+  out.innerHTML += `🏆 最高分：<span class="pass">${top.name}</span> — <span class="pass">${top.score}</span> 分 (${top.class}班)`;
+}
+
+// ==============================
+// 10. 綜合挑戰：購物車動態結帳模擬
+// ==============================
+const cart = [];
+
+function addItem() {
+  const name = document.getElementById('cart-name').value.trim();
+  const price = parseFloat(document.getElementById('cart-price').value);
+  const qty = parseInt(document.getElementById('cart-qty').value);
+  const discount = parseFloat(document.getElementById('cart-discount').value) || 0;
+
+  const out = document.getElementById('cart-output');
+  if (!name) { out.innerHTML = '<span class="fail">請輸入商品名稱</span>'; return; }
+  if (isNaN(price) || price < 0) { out.innerHTML = '<span class="fail">請輸入有效單價</span>'; return; }
+  if (isNaN(qty) || qty < 1) { out.innerHTML = '<span class="fail">數量需大於 0</span>'; return; }
+
+  cart.push({ name, price, qty, discount });
+  renderCart();
+  out.innerHTML = `<span class="pass">✓</span> 已新增「${name}」$${price} × ${qty} (折扣 ${discount}%)`;
+  document.getElementById('cart-name').value = '';
+  document.getElementById('cart-price').value = '';
+  document.getElementById('cart-qty').value = '1';
+  document.getElementById('cart-discount').value = '0';
+}
+
+function renderCart() {
+  const tbody = document.getElementById('cart-body');
+  if (!cart.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-muted" style="text-align:center;">購物車是空的</td></tr>';
+    document.getElementById('cart-count').textContent = '0';
+    document.getElementById('cart-discount-total').textContent = '$0';
+    document.getElementById('cart-tax').textContent = '$0';
+    document.getElementById('cart-total').textContent = '$0';
+    return;
+  }
+
+  let subtotalSum = 0, discountSum = 0;
+  tbody.innerHTML = cart.map((item, i) => {
+    const subtotal = item.price * item.qty;
+    const discAmt = subtotal * (item.discount / 100);
+    const lineTotal = subtotal - discAmt;
+    subtotalSum += subtotal;
+    discountSum += discAmt;
+    return `<tr>
+      <td>${item.name}</td>
+      <td class="text-right">$${item.price.toFixed(2)}</td>
+      <td class="text-right">${item.qty}</td>
+      <td class="text-right">${item.discount}%</td>
+      <td class="text-right">$${lineTotal.toFixed(2)}</td>
+      <td><button class="btn btn-danger" style="padding:.25rem .5rem;font-size:.75rem;" onclick="removeItem(${i})">✕</button></td>
+    </tr>`;
+  }).join('');
+
+  const tax = (subtotalSum - discountSum) * 0.05;
+  const total = subtotalSum - discountSum + tax;
+
+  document.getElementById('cart-count').textContent = cart.length;
+  document.getElementById('cart-discount-total').textContent = `-$${discountSum.toFixed(2)}`;
+  document.getElementById('cart-tax').textContent = `$${tax.toFixed(2)}`;
+  document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
+}
+
+function removeItem(index) {
+  cart.splice(index, 1);
+  renderCart();
+  document.getElementById('cart-output').innerHTML = `<span class="info">已移除商品</span>`;
+}
+
+function checkout() {
+  const out = document.getElementById('cart-output');
+  if (!cart.length) { out.innerHTML = '<span class="fail">購物車是空的，無法結帳</span>'; return; }
+
+  let subtotalSum = 0, discountSum = 0;
+  cart.forEach(item => {
+    const subtotal = item.price * item.qty;
+    discountSum += subtotal * (item.discount / 100);
+    subtotalSum += subtotal;
+  });
+  const tax = (subtotalSum - discountSum) * 0.05;
+  const total = subtotalSum - discountSum + tax;
+
+  out.innerHTML = `<span class="pass">✓ 結帳成功！</span><br>`
+    + `小計: $${subtotalSum.toFixed(2)}<br>`
+    + `折扣: -$${discountSum.toFixed(2)}<br>`
+    + `稅金 (5%): $${tax.toFixed(2)}<br>`
+    + `<span class="pass">總額: $${total.toFixed(2)}</span><br>`
+    + `<span class="info">感謝您的購買！</span>`;
+  cart.length = 0;
+  renderCart();
+}
+
+function clearCart() {
+  cart.length = 0;
+  renderCart();
+  document.getElementById('cart-output').innerHTML = '<span class="info">購物車已清空</span>';
+}
+
+// 初始渲染購物車
+renderCart();
+</script>
+</body>
+</html>
