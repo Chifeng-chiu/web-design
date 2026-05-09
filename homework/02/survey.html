@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>生活問卷調查</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
+    .container {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      padding: 40px;
+      max-width: 700px;
+      width: 100%;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+    .section {
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eee;
+    }
+    .section:last-child { border-bottom: none; margin-bottom: 0; }
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title .badge {
+      font-size: 12px;
+      background: #667eea;
+      color: #fff;
+      padding: 2px 10px;
+      border-radius: 12px;
+    }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-group:last-child { margin-bottom: 0; }
+    label {
+      display: block;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+    label .required { color: #e74c3c; }
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+      font-family: inherit;
+    }
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    textarea { resize: vertical; min-height: 80px; }
+    .radio-group, .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 24px;
+      padding: 4px 0;
+    }
+    .radio-item, .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #444;
+    }
+    .radio-item input, .checkbox-item input {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+    .btn-submit:active { transform: translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📋 生活問卷調查</h1>
+    <p class="subtitle">感謝您撥冗填寫此問卷，您的意見是我們進步的動力</p>
+
+    <form id="surveyForm">
+      <!-- 填空題 -->
+      <div class="section">
+        <div class="section-title">
+          📝 基本資料 <span class="badge">填空題</span>
+        </div>
+        <div class="form-group">
+          <label for="name">姓名 <span class="required">*</span></label>
+          <input type="text" id="name" name="name" placeholder="請輸入您的姓名" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email <span class="required">*</span></label>
+          <input type="email" id="email" name="email" placeholder="example@mail.com" required>
+        </div>
+        <div class="form-group">
+          <label for="age">年齡</label>
+          <input type="number" id="age" name="age" placeholder="請輸入您的年齡" min="1" max="150">
+        </div>
+        <div class="form-group">
+          <label for="job">職業</label>
+          <input type="text" id="job" name="job" placeholder="請輸入您的職業">
+        </div>
+      </div>
+
+      <!-- 單選題 -->
+      <div class="section">
+        <div class="section-title">
+          🔘 生活習慣 <span class="badge">單選題</span>
+        </div>
+        <div class="form-group">
+          <label>性別 <span class="required">*</span></label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="gender" value="male" required> 男性</label>
+            <label class="radio-item"><input type="radio" name="gender" value="female"> 女性</label>
+            <label class="radio-item"><input type="radio" name="gender" value="other"> 其他</label>
+            <label class="radio-item"><input type="radio" name="gender" value="no"> 不便透露</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>您每週運動的頻率？ <span class="required">*</span></label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="exercise" value="0" required> 幾乎不運動</label>
+            <label class="radio-item"><input type="radio" name="exercise" value="1-2"> 每週 1~2 次</label>
+            <label class="radio-item"><input type="radio" name="exercise" value="3-4"> 每週 3~4 次</label>
+            <label class="radio-item"><input type="radio" name="exercise" value="5+"> 每週 5 次以上</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>您每天的睡眠時間？</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="sleep" value="lt5"> 不到 5 小時</label>
+            <label class="radio-item"><input type="radio" name="sleep" value="5-6"> 5~6 小時</label>
+            <label class="radio-item"><input type="radio" name="sleep" value="7-8"> 7~8 小時</label>
+            <label class="radio-item"><input type="radio" name="sleep" value="gt8"> 超過 8 小時</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 多選題 -->
+      <div class="section">
+        <div class="section-title">
+          ☑️ 興趣與偏好 <span class="badge">多選題</span>
+        </div>
+        <div class="form-group">
+          <label>您平時的休閒活動？（可複選） <span class="required">*</span></label>
+          <div class="checkbox-group">
+            <label class="checkbox-item"><input type="checkbox" name="hobby" value="reading"> 閱讀</label>
+            <label class="checkbox-item"><input type="checkbox" name="hobby" value="music"> 聽音樂</label>
+            <label class="checkbox-item"><input type="checkbox" name="hobby" value="sports"> 運動</label>
+            <label class="checkbox-item"><input type="checkbox" name="hobby" value="gaming"> 打電動</label>
+            <label class="checkbox-item"><input type="checkbox" name="hobby" value="travel"> 旅遊</label>
+            <label class="checkbox-item"><input type="checkbox" name="hobby" value="movie"> 看電影</label>
+            <label class="checkbox-item"><input type="checkbox" name="hobby" value="cooking"> 烹飪</label>
+            <label class="checkbox-item"><input type="checkbox" name="hobby" value="shopping"> 購物</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>您偏好的飲食類型？（可複選）</label>
+          <div class="checkbox-group">
+            <label class="checkbox-item"><input type="checkbox" name="food" value="chinese"> 中式料理</label>
+            <label class="checkbox-item"><input type="checkbox" name="food" value="japanese"> 日式料理</label>
+            <label class="checkbox-item"><input type="checkbox" name="food" value="western"> 西式料理</label>
+            <label class="checkbox-item"><input type="checkbox" name="food" value="korean"> 韓式料理</label>
+            <label class="checkbox-item"><input type="checkbox" name="food" value="dessert"> 甜點</label>
+            <label class="checkbox-item"><input type="checkbox" name="food" value="fastfood"> 速食</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 填空題：意見回饋 -->
+      <div class="section">
+        <div class="section-title">
+          💬 意見回饋 <span class="badge">填空題</span>
+        </div>
+        <div class="form-group">
+          <label for="feedback">您對目前生活品質的滿意度與建議</label>
+          <textarea id="feedback" name="feedback" placeholder="請分享您的想法..."></textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit">✅ 提交問卷</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('surveyForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('感謝您填寫問卷！您的回答已成功提交。');
+    });
+  </script>
+</body>
+</html>
