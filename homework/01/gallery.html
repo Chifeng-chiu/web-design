@@ -98,22 +98,13 @@
     const category = params.get('category') || '';
 
     const titles = {
-      sports: '🏀 運動',
       photography: '📷 攝影',
       travel: '✈️ 旅遊'
     };
     document.getElementById('category-title').textContent = titles[category] || '📸 媒體櫃';
 
     const mediaList = {
-      sports: [
-        { type: 'image', src: 'photos/sports/669356407_2038990816691962_1104146398293664309_n.jpg' },
-        { type: 'image', src: 'photos/sports/683614272_2132815947500989_2424287604514095533_n.jpg' },
-        { type: 'image', src: 'photos/sports/685567213_2391079888044468_3901601475964678006_n.jpg' },
-        { type: 'image', src: 'photos/sports/685655747_3538688919613059_5460749650297502826_n.jpg' },
-        { type: 'image', src: 'photos/sports/685719567_943062245268245_7984522601540850317_n.jpg' },
-        { type: 'image', src: 'photos/sports/690790569_979188057844670_2526604837075317126_n.jpg' },
-        { type: 'image', src: 'photos/sports/691028755_741277475674555_7073651965007698528_n.jpg' },
-      ],
+
       photography: [
         { type: 'image', src: 'photos/photography/683175306_1162653976933075_7722957398972912951_n.jpg' },
         { type: 'image', src: 'photos/photography/683767582_1913545722673150_2931050367931900919_n.jpg' },
