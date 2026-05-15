@@ -8,7 +8,7 @@
 
 本學期所有作業主要透過AI協助完成,使用了OPENCODE、Gemini、Claude
 
-使用的 AI 工具
+###使用的 AI 工具
 - Claude:程式碼生成、設計優化、除錯
 - Gemini:專案內容討論、尋求開發建議、方向規劃
 - OpenCode:程式碼撰寫與實作
