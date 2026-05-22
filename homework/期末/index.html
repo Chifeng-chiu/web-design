@@ -377,6 +377,87 @@
     .scroll-top.show { opacity: 1; transform: translateY(0); }
     .scroll-top:hover { background: rgba(99,102,241,.35); }
 
+    /* ── Card Actions ── */
+    .card-actions {
+      display: flex;
+      gap: .6rem;
+      flex-wrap: wrap;
+    }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #141423;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 1.25rem;
+      max-width: 520px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 2rem;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(255,255,255,.05);
+      color: #7e8fa8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      transition: all .2s;
+    }
+    .modal-close:hover {
+      background: rgba(255,255,255,.1);
+      color: #fff;
+    }
+    .modal-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.35rem;
+      color: #f0f0f0;
+      margin-bottom: 1.5rem;
+      padding-right: 2rem;
+    }
+    .tech-list {
+      display: flex;
+      flex-direction: column;
+      gap: .85rem;
+    }
+    .tech-item {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: .85rem;
+      padding: 1rem 1.25rem;
+    }
+    .tech-name {
+      font-weight: 600;
+      color: #c7d2fe;
+      font-size: .88rem;
+      margin-bottom: .25rem;
+    }
+    .tech-desc {
+      font-size: .8rem;
+      color: #7e8fa8;
+      line-height: 1.6;
+    }
+
     /* ── Responsive ── */
     @media (max-width: 640px) {
       .grid { grid-template-columns: 1fr; }
@@ -422,7 +503,7 @@
   <div class="grid">
 
     <!-- 01 -->
-    <div class="card" data-tags="frontend js">
+    <div class="card" data-tags="frontend js" data-project="01">
       <div class="card-banner b-violet"><span class="card-icon">📸</span></div>
       <div class="card-body">
         <div class="card-title">個人網站 + 相簿</div>
@@ -435,12 +516,15 @@
           <span class="card-tag tag-css">CSS3</span>
           <span class="card-tag tag-js">Vanilla JS</span>
         </div>
-        <a class="card-btn" href="../01/index.html" target="_blank">前往作品 →</a>
+        <div class="card-actions">
+          <a class="card-btn" href="../01/index.html" target="_blank">前往作品 →</a>
+          <button class="card-btn card-btn-outline tech-btn" data-project="01">技術說明</button>
+        </div>
       </div>
     </div>
 
     <!-- 02 -->
-    <div class="card" data-tags="frontend">
+    <div class="card" data-tags="frontend" data-project="02">
       <div class="card-banner b-emerald"><span class="card-icon">📋</span></div>
       <div class="card-body">
         <div class="card-title">生活習慣問卷</div>
@@ -453,12 +537,15 @@
           <span class="card-tag tag-css">CSS3</span>
           <span class="card-tag tag-other">表單驗證</span>
         </div>
-        <a class="card-btn" href="../02/index.html" target="_blank">前往作品 →</a>
+        <div class="card-actions">
+          <a class="card-btn" href="../02/index.html" target="_blank">前往作品 →</a>
+          <button class="card-btn card-btn-outline tech-btn" data-project="02">技術說明</button>
+        </div>
       </div>
     </div>
 
     <!-- 03 -->
-    <div class="card" data-tags="node">
+    <div class="card" data-tags="node" data-project="03">
       <div class="card-banner b-blue"><span class="card-icon">🚀</span></div>
       <div class="card-body">
         <div class="card-title">Node.js Hello World</div>
@@ -469,12 +556,15 @@
         <div class="card-tags">
           <span class="card-tag tag-node">Node.js</span>
         </div>
-        <a class="card-btn card-btn-outline" href="https://github.com/leo891222/stock" target="_blank">檢視原始碼 →</a>
+        <div class="card-actions">
+          <a class="card-btn card-btn-outline" href="https://github.com/leo891222/stock" target="_blank">檢視原始碼 →</a>
+          <button class="card-btn card-btn-outline tech-btn" data-project="03">技術說明</button>
+        </div>
       </div>
     </div>
 
     <!-- 04 -->
-    <div class="card" data-tags="js frontend">
+    <div class="card" data-tags="js frontend" data-project="04">
       <div class="card-banner b-amber"><span class="card-icon">🧩</span></div>
       <div class="card-body">
         <div class="card-title">JavaScript 十題練習</div>
@@ -487,12 +577,15 @@
           <span class="card-tag tag-css">CSS3</span>
           <span class="card-tag tag-js">Vanilla JS</span>
         </div>
-        <a class="card-btn" href="../04/index.html" target="_blank">前往作品 →</a>
+        <div class="card-actions">
+          <a class="card-btn" href="../04/index.html" target="_blank">前往作品 →</a>
+          <button class="card-btn card-btn-outline tech-btn" data-project="04">技術說明</button>
+        </div>
       </div>
     </div>
 
     <!-- 05 -->
-    <div class="card" data-tags="node">
+    <div class="card" data-tags="node" data-project="05">
       <div class="card-banner b-rose"><span class="card-icon">📝</span></div>
       <div class="card-body">
         <div class="card-title">部落格系統</div>
@@ -507,12 +600,15 @@
           <span class="card-tag tag-other">EJS</span>
           <span class="card-tag tag-other">bcrypt</span>
         </div>
-        <a class="card-btn" href="../05/index.html" target="_blank">前往作品 →</a>
+        <div class="card-actions">
+          <a class="card-btn" href="../05/index.html" target="_blank">前往作品 →</a>
+          <button class="card-btn card-btn-outline tech-btn" data-project="05">技術說明</button>
+        </div>
       </div>
     </div>
 
     <!-- 06 -->
-    <div class="card" data-tags="js frontend">
+    <div class="card" data-tags="js frontend" data-project="06">
       <div class="card-banner b-cyan"><span class="card-icon">⚡</span></div>
       <div class="card-body">
         <div class="card-title">JS 函式學習中心</div>
@@ -525,12 +621,15 @@
           <span class="card-tag tag-css">CSS3</span>
           <span class="card-tag tag-js">Vanilla JS</span>
         </div>
-        <a class="card-btn" href="../06/index.html" target="_blank">前往作品 →</a>
+        <div class="card-actions">
+          <a class="card-btn" href="../06/index.html" target="_blank">前往作品 →</a>
+          <button class="card-btn card-btn-outline tech-btn" data-project="06">技術說明</button>
+        </div>
       </div>
     </div>
 
     <!-- 07 -->
-    <div class="card" data-tags="node js">
+    <div class="card" data-tags="node js" data-project="07">
       <div class="card-banner b-fuchsia"><span class="card-icon">🔧</span></div>
       <div class="card-body">
         <div class="card-title">後端模式 JS 挑戰</div>
@@ -543,12 +642,15 @@
           <span class="card-tag tag-css">CSS3</span>
           <span class="card-tag tag-node">Node.js 模式</span>
         </div>
-        <a class="card-btn" href="../07/index.html" target="_blank">前往作品 →</a>
+        <div class="card-actions">
+          <a class="card-btn" href="../07/index.html" target="_blank">前往作品 →</a>
+          <button class="card-btn card-btn-outline tech-btn" data-project="07">技術說明</button>
+        </div>
       </div>
     </div>
 
     <!-- 期中 -->
-    <div class="card" data-tags="python">
+    <div class="card" data-tags="python" data-project="期中">
       <div class="card-banner b-orange"><span class="card-icon">📈</span></div>
       <div class="card-body">
         <div class="card-title">StockBoard 股市論壇</div>
@@ -563,12 +665,24 @@
           <span class="card-tag tag-other">yfinance</span>
           <span class="card-tag tag-js">Chart.js</span>
         </div>
-        <a class="card-btn" href="../期中/index.html" target="_blank">前往作品 →</a>
+        <div class="card-actions">
+          <a class="card-btn" href="../期中/index.html" target="_blank">前往作品 →</a>
+          <button class="card-btn card-btn-outline tech-btn" data-project="期中">技術說明</button>
+        </div>
       </div>
     </div>
 
   </div>
 </section>
+
+<!-- ═══ Tech Modal ═══ -->
+<div class="modal-overlay" id="techModal">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <h3 class="modal-title" id="modalTitle"></h3>
+    <div class="tech-list" id="techList"></div>
+  </div>
+</div>
 
 <div class="divider"></div>
 
@@ -692,6 +806,111 @@
     scrollBtn.classList.toggle('show', window.scrollY > 300);
   });
   scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  /* ── Tech Details Modal ── */
+  const techData = {
+    "01": {
+      name: "個人網站 + 相簿",
+      techs: [
+        { name: "HTML5", desc: "語意化標籤建立個人形象頁面與相簿頁面結構，支援無障礙閱讀" },
+        { name: "CSS3", desc: "玻璃擬態（glassmorphism）設計、漸層主題配色、Flexbox/Grid 響應式排版" },
+        { name: "Vanilla JS", desc: "動態相簿分類瀏覽（運動／攝影／旅遊），DOM 操作實現圖片切換與篩選" }
+      ]
+    },
+    "02": {
+      name: "生活習慣問卷",
+      techs: [
+        { name: "HTML5", desc: "表單元素搭配語意化結構，包含輸入框、選項按鈕、核取方塊、下拉選單" },
+        { name: "CSS3", desc: "自訂表單樣式、視覺回饋效果、響應式佈局，維持一致的設計語言" },
+        { name: "表單驗證", desc: "前端表單驗證，確保資料格式正確後才提交，提升使用者體驗" }
+      ]
+    },
+    "03": {
+      name: "Node.js Hello World",
+      techs: [
+        { name: "Node.js", desc: "第一個 Node.js 伺服器程式，使用內建 http 模組建立基本 HTTP 服務" }
+      ]
+    },
+    "04": {
+      name: "JavaScript 十題練習",
+      techs: [
+        { name: "HTML5", desc: "建立練習題頁面結構，嵌入 JavaScript 互動內容" },
+        { name: "CSS3", desc: "簡潔的練習題介面設計，維持與整體一致的暗色風格" },
+        { name: "Vanilla JS", desc: "十道實作題涵蓋奇偶判斷、陣列處理、JSON 操作、篩選排序、購物車模擬等" }
+      ]
+    },
+    "05": {
+      name: "部落格系統",
+      techs: [
+        { name: "Node.js", desc: "伺服器端 JavaScript 執行環境，處理 HTTP 請求和回應" },
+        { name: "Express", desc: "Web 應用框架，簡化路由設計、中介軟體整合、請求和回應處理" },
+        { name: "SQLite", desc: "輕量級嵌入式資料庫，儲存使用者資料、文章內容、分類資訊" },
+        { name: "EJS", desc: "伺服器端模板引擎，動態渲染 HTML 頁面，整合資料與模板" },
+        { name: "bcrypt", desc: "密碼雜湊函式庫，安全儲存使用者密碼，保護帳戶安全" }
+      ]
+    },
+    "06": {
+      name: "JS 函式學習中心",
+      techs: [
+        { name: "HTML5", desc: "頁面結構包含選擇題測驗區與實作練習區，支援切換模式" },
+        { name: "CSS3", desc: "雙模式介面設計，區別測驗與練習的視覺風格，維持一致性" },
+        { name: "Vanilla JS", desc: "箭頭函式、閉包、IIFE、回呼函式、高階函式等核心概念的互動學習工具" }
+      ]
+    },
+    "07": {
+      name: "後端模式 JS 挑戰",
+      techs: [
+        { name: "HTML5", desc: "練習題頁面結構，展示題目與程式碼" },
+        { name: "CSS3", desc: "簡潔清晰的程式碼展示與練習介面" },
+        { name: "Node.js 模式", desc: "十題聚焦 Express/Node.js 後端開發：解構賦值、Error-First Callback、模擬資料庫查詢等" }
+      ]
+    },
+    "期中": {
+      name: "StockBoard 股市論壇",
+      techs: [
+        { name: "Python", desc: "後端主要開發語言，提供完整的 RESTful API 服務" },
+        { name: "FastAPI", desc: "高效能 Python Web 框架，自動生成 API 文件，支援非同步處理" },
+        { name: "SQLAlchemy", desc: "Python ORM 框架，管理資料庫模型與查詢，支援多種資料庫後端" },
+        { name: "yfinance", desc: "Yahoo Finance API 的 Python 封裝，提供即時股價查詢功能" },
+        { name: "Chart.js", desc: "前端圖表繪製函式庫，呈現股價走勢圖與技術分析圖表" }
+      ]
+    }
+  };
+
+  const modalOverlay = document.getElementById('techModal');
+  const modalTitle = document.getElementById('modalTitle');
+  const techList = document.getElementById('techList');
+  const modalClose = document.getElementById('modalClose');
+
+  function openTechModal(projectId) {
+    const data = techData[projectId];
+    if (!data) return;
+    modalTitle.textContent = data.name + ' — 使用技術';
+    techList.innerHTML = data.techs.map(t =>
+      `<div class="tech-item">
+        <div class="tech-name">${t.name}</div>
+        <div class="tech-desc">${t.desc}</div>
+      </div>`
+    ).join('');
+    modalOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeTechModal() {
+    modalOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('.tech-btn').forEach(btn => {
+    btn.addEventListener('click', () => openTechModal(btn.dataset.project));
+  });
+  modalClose.addEventListener('click', closeTechModal);
+  modalOverlay.addEventListener('click', e => {
+    if (e.target === modalOverlay) closeTechModal();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeTechModal();
+  });
 </script>
 </body>
 </html>
