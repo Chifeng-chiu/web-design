@@ -16,9 +16,33 @@
 
 ---
 
-## 作業 03 — Node.js Hello World：跳脫瀏覽器的 JavaScript
+## 作業 03 — Node.js Hello World（Web Server 版）：從終端機到瀏覽器
 
-這支看似簡單的程式碼，其實代表了一個觀念上的斷裂：JavaScript 不再只能活在瀏覽器的 `<script>` 標籤裡。當你在終端機執行 `node hello.js` 並看到 "Hello, World!" 印出來的那一刻，你實際上已經體驗了「執行環境切換」這個開發者必備的抽象理解能力。Node.js 的核心原理是事件驅動的非阻塞 I/O 模型，這支 hello world 雖然沒有展現任何非同步操作，但它是你通往伺服器端開發的第一塊基石 — 理解在你寫的程式碼與作業系統之間，有一個稱為「執行期環境」的中介層存在。
+這支程式從最初的一行 `console.log("Hello World")` 升級為一個真正的網頁伺服器。它使用 Node.js 內建的 `http` 模組，在本地端監聽 3000 埠號，並在瀏覽器中渲染出一頁帶有樣式的歡迎畫面。
+
+這個升級的關鍵意義在於：JavaScript 不再只是印出文字的腳本語言，而是能夠**處理 HTTP 請求、操作回應物件、與瀏覽器進行雙向溝通**的伺服器端語言。每一次在瀏覽器輸入網址並按下 Enter，背後都觸發了一次 `http.createServer()` 中的回呼函式 — 這就是全端開發最核心的「請求—回應」循環。
+
+### 如何執行
+
+```bash
+# 1. 確認已安裝 Node.js（https://nodejs.org）
+node -v
+
+# 2. 進入專案目錄
+cd homework/期末
+
+# 3. 執行程式（不需安裝任何套件，http 是內建模組）
+node server.js
+
+# 4. 在瀏覽器開啟
+#    → http://localhost:3000
+#    → http://127.0.0.1:3000
+
+# 5. 停止伺服器
+#    在終端機按下 Ctrl + C
+```
+
+> 💡 `server.js` 中包含詳細的中文註解，說明了 `require`、`createServer`、`req`、`res`、`listen` 等每個語法的用途，適合初學者邊讀邊學。
 
 ---
 
