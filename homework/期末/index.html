@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FENG · 作品集</title>
+  <title>FENG · 終極防護迷宮與作品集</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -21,8 +21,6 @@
       --green: #3fb950;
       --orange: #d29922;
       --red: #f85149;
-      --purple: #a371f7;
-      --pink: #f778ba;
       --cyan: #39d353;
     }
 
@@ -39,622 +37,204 @@
 
     ::selection { background: rgba(47,129,247,.3); color: var(--text); }
 
-    /* ── Navbar ── */
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(13,17,23,.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 2rem;
-      height: 56px;
+    /* =========================================
+       🎮 遊戲視圖專用 CSS
+       ========================================= */
+    #game-view {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .nav-logo {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .9rem;
-      font-weight: 700;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-    }
-    .nav-logo .prompt { color: var(--green); }
-    .nav-logo .cursor {
-      display: inline-block;
-      width: 8px; height: 14px;
-      background: var(--text);
-      animation: blink 1.2s step-end infinite;
-      vertical-align: middle;
-    }
-    @keyframes blink { 50% { opacity: 0; } }
-    .nav-links {
-      display: flex;
-      gap: 1.5rem;
-      list-style: none;
-    }
-    .nav-links a {
-      font-size: .82rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color .15s;
-    }
-    .nav-links a:hover { color: var(--text); }
-
-    /* ── Hero ── */
-    .hero {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 5rem 2rem 3rem;
-    }
-    .hero-top {
-      display: flex;
-      align-items: flex-start;
-      gap: 2rem;
-      margin-bottom: 2rem;
-    }
-    .avatar {
-      width: 80px; height: 80px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--bg-3), var(--bg-2));
-      border: 2px solid var(--border);
-      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 2rem;
-      flex-shrink: 0;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      transition: opacity 1s ease, visibility 1s;
     }
-    .hero-info { flex: 1; }
-    .hero-name {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: .2rem;
-    }
-    .hero-handle {
+
+    .game-header { text-align: center; margin-bottom: 1rem; height: 60px; }
+    .game-title {
       font-family: 'JetBrains Mono', monospace;
-      font-size: .85rem;
-      color: var(--text-muted);
-      margin-bottom: .75rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
     }
-    .hero-bio {
-      font-size: .92rem;
-      color: var(--text-muted);
-      max-width: 520px;
-      margin-bottom: 1rem;
-    }
-    .hero-meta {
+    .game-subtitle { font-size: 0.85rem; color: var(--text-muted); transition: color 0.3s; }
+
+    .game-container {
       display: flex;
-      gap: 1.25rem;
-      flex-wrap: wrap;
+      gap: 2rem;
+      background: var(--bg-2);
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4);
     }
-    .hero-meta-item {
-      display: flex;
-      align-items: center;
-      gap: .35rem;
-      font-size: .82rem;
-      color: var(--text-muted);
+
+    #gameCanvas {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
     }
+
+    .hud { width: 220px; display: flex; flex-direction: column; }
+    .hud-title {
+      font-size: 0.9rem; font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem; margin-bottom: 0.75rem;
+      display: flex; justify-content: space-between;
+    }
+    .progress-text { color: var(--green); font-family: 'JetBrains Mono', monospace; }
+    .lives-text { font-size: 0.9rem; letter-spacing: 2px; }
+    
+    .item-list { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+    .item { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; transition: color 0.3s; }
+    .item.unlocked { color: var(--text); }
+    .item-icon { width: 16px; height: 16px; border: 1px solid var(--text-muted); border-radius: 3px; display: inline-block; position: relative; }
+    .item.unlocked .item-icon { border-color: var(--green); background: var(--green); }
+
+    .d-pad { display: none; flex-direction: column; align-items: center; gap: 0.5rem; margin-top: 1.5rem; }
+    .d-row { display: flex; gap: 0.5rem; }
+    .d-btn { width: 50px; height: 50px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .d-btn:active { background: var(--border); }
+
+    @media (max-width: 768px) {
+      .game-container { flex-direction: column; gap: 1rem; padding: 1rem; }
+      .hud { width: 100%; }
+      .d-pad { display: flex; }
+      #gameCanvas { width: 100%; height: auto; }
+    }
+
+    /* =========================================
+       🚀 作品集視圖專用 CSS (預設隱藏)
+       ========================================= */
+    #portfolio-view {
+      display: none;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+    }
+
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(13,17,23,.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo { font-family: 'JetBrains Mono', monospace; font-size: .9rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: .5rem; }
+    .nav-logo .prompt { color: var(--green); }
+    .nav-logo .cursor { display: inline-block; width: 8px; height: 14px; background: var(--text); animation: blink 1.2s step-end infinite; vertical-align: middle; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+    .nav-links a { font-size: .82rem; color: var(--text-muted); text-decoration: none; transition: color .15s; }
+    .nav-links a:hover { color: var(--text); }
+
+    .hero { max-width: 900px; margin: 0 auto; padding: 5rem 2rem 3rem; }
+    .hero-top { display: flex; align-items: flex-start; gap: 2rem; margin-bottom: 2rem; }
+    .avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--bg-3), var(--bg-2)); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 2rem; flex-shrink: 0; }
+    .hero-info { flex: 1; }
+    .hero-name { font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: .2rem; }
+    .hero-handle { font-family: 'JetBrains Mono', monospace; font-size: .85rem; color: var(--text-muted); margin-bottom: .75rem; }
+    .hero-bio { font-size: .92rem; color: var(--text-muted); max-width: 520px; margin-bottom: 1rem; }
+    .hero-meta { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+    .hero-meta-item { display: flex; align-items: center; gap: .35rem; font-size: .82rem; color: var(--text-muted); }
     .hero-meta-item svg { opacity: .6; }
 
-    /* ── Tag Cloud ── */
-    .tagcloud-section {
-      max-width: 900px;
-      margin: 0 auto 2rem;
-      padding: 0 2rem;
-    }
-    .tagcloud-box {
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 1.25rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .tagcloud-header {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: .5rem;
-    }
-    .tagcloud-title {
-      font-size: .82rem;
-      color: var(--text-muted);
-    }
-    .tagcloud-hint {
-      font-size: .75rem;
-      color: var(--text-subtle);
-      font-family: 'JetBrains Mono', monospace;
-    }
-    #tagcloud-canvas {
-      cursor: grab;
-      display: block;
-    }
+    .tagcloud-section { max-width: 900px; margin: 0 auto 2rem; padding: 0 2rem; }
+    .tagcloud-box { background: var(--bg-2); border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem; display: flex; flex-direction: column; align-items: center; }
+    .tagcloud-header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
+    .tagcloud-title { font-size: .82rem; color: var(--text-muted); }
+    .tagcloud-hint { font-size: .75rem; color: var(--text-subtle); font-family: 'JetBrains Mono', monospace; }
+    #tagcloud-canvas { cursor: grab; display: block; }
     #tagcloud-canvas:active { cursor: grabbing; }
 
-    /* ── Main layout ── */
-    .main {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0 2rem 4rem;
-      display: grid;
-      grid-template-columns: 1fr 280px;
-      gap: 1.5rem;
-      align-items: start;
-    }
+    .main { max-width: 900px; margin: 0 auto; padding: 0 2rem 4rem; display: grid; grid-template-columns: 1fr 280px; gap: 1.5rem; align-items: start; }
+    .section-title { font-size: .85rem; font-weight: 600; color: var(--text); margin-bottom: 1rem; padding-bottom: .6rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: .5rem; }
+    .section-title .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; }
 
-    /* ── Section titles ── */
-    .section-title {
-      font-size: .85rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 1rem;
-      padding-bottom: .6rem;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-    }
-    .section-title .dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--green);
-      display: inline-block;
-    }
+    .filter-row { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .filter-btn { padding: .25rem .75rem; border-radius: 999px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-size: .75rem; font-family: 'Inter', sans-serif; cursor: pointer; transition: all .15s; }
+    .filter-btn:hover, .filter-btn.active { border-color: var(--accent); color: var(--accent-hover); }
+    .filter-btn.active { background: rgba(47,129,247,.15); }
 
-    /* ── Filter ── */
-    .filter-row {
-      display: flex;
-      gap: .5rem;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
-    }
-    .filter-btn {
-      padding: .25rem .75rem;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-muted);
-      font-size: .75rem;
-      font-family: 'Inter', sans-serif;
-      cursor: pointer;
-      transition: all .15s;
-    }
-    .filter-btn:hover {
-      border-color: var(--accent);
-      color: var(--accent-hover);
-    }
-    .filter-btn.active {
-      background: rgba(47,129,247,.15);
-      border-color: var(--accent);
-      color: var(--accent-hover);
-    }
-
-    /* ── Repo Cards ── */
     .repo-list { display: flex; flex-direction: column; gap: .75rem; }
-
-    .repo-card {
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 1rem 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: .5rem;
-      transition: border-color .15s, background .15s;
-      opacity: 0;
-      transform: translateY(12px);
-    }
-    .repo-card.visible {
-      opacity: 1;
-      transform: translateY(0);
-      transition: opacity .4s ease, transform .4s ease, border-color .15s, background .15s;
-    }
-    .repo-card:hover {
-      border-color: var(--accent);
-      background: rgba(47,129,247,.04);
-    }
-    .repo-card-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-    .repo-icon-name {
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-    }
-    .repo-icon {
-      font-size: 1.1rem;
-      line-height: 1;
-    }
-    .repo-name {
-      font-size: .92rem;
-      font-weight: 600;
-      color: var(--accent-hover);
-      text-decoration: none;
-    }
+    .repo-card { background: var(--bg-2); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: .5rem; transition: border-color .15s, background .15s; opacity: 0; transform: translateY(12px); }
+    .repo-card.visible { opacity: 1; transform: translateY(0); transition: opacity .4s ease, transform .4s ease, border-color .15s, background .15s; }
+    .repo-card:hover { border-color: var(--accent); background: rgba(47,129,247,.04); }
+    .repo-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+    .repo-icon-name { display: flex; align-items: center; gap: .5rem; }
+    .repo-icon { font-size: 1.1rem; line-height: 1; }
+    .repo-name { font-size: .92rem; font-weight: 600; color: var(--accent-hover); text-decoration: none; }
     .repo-name:hover { text-decoration: underline; }
-    .repo-badge {
-      font-size: .68rem;
-      padding: .1rem .5rem;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .repo-badge.midterm {
-      border-color: var(--orange);
-      color: var(--orange);
-    }
-    .repo-desc {
-      font-size: .82rem;
-      color: var(--text-muted);
-      line-height: 1.55;
-    }
-    .repo-footer {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-top: .25rem;
-    }
-    .repo-lang {
-      display: flex;
-      align-items: center;
-      gap: .35rem;
-      font-size: .75rem;
-      color: var(--text-muted);
-    }
-    .lang-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .repo-tags {
-      display: flex;
-      gap: .35rem;
-      flex-wrap: wrap;
-      flex: 1;
-    }
-    .repo-tag {
-      font-size: .68rem;
-      padding: .1rem .5rem;
-      border-radius: 3px;
-      background: var(--bg-3);
-      color: var(--text-muted);
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .repo-link {
-      font-size: .75rem;
-      color: var(--accent);
-      text-decoration: none;
-      margin-left: auto;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: .25rem;
-    }
+    .repo-badge { font-size: .68rem; padding: .1rem .5rem; border-radius: 999px; border: 1px solid var(--border); color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+    .repo-badge.midterm { border-color: var(--orange); color: var(--orange); }
+    .repo-desc { font-size: .82rem; color: var(--text-muted); line-height: 1.55; }
+    .repo-footer { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: .25rem; }
+    .repo-lang { display: flex; align-items: center; gap: .35rem; font-size: .75rem; color: var(--text-muted); }
+    .lang-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .repo-tags { display: flex; gap: .35rem; flex-wrap: wrap; flex: 1; }
+    .repo-tag { font-size: .68rem; padding: .1rem .5rem; border-radius: 3px; background: var(--bg-3); color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+    .repo-link { font-size: .75rem; color: var(--accent); text-decoration: none; margin-left: auto; white-space: nowrap; display: flex; align-items: center; gap: .25rem; }
     .repo-link:hover { color: var(--accent-hover); text-decoration: underline; }
 
-    /* ── Terminal ── */
-    .terminal-box {
-      margin-top: .5rem;
-      border-radius: 6px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .8rem;
-    }
-    .terminal-bar {
-      background: #2d333b;
-      padding: .45rem .75rem;
-      display: flex;
-      align-items: center;
-      gap: .4rem;
-    }
-    .t-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      display: inline-block;
-    }
-    .t-title {
-      margin-left: .5rem;
-      color: var(--text-muted);
-      font-size: .75rem;
-    }
-    .terminal-body {
-      background: #0d1117;
-      padding: .85rem 1rem;
-      min-height: 48px;
-      color: var(--green);
-      line-height: 1.6;
-    }
-    .terminal-cursor {
-      animation: blink 1s step-end infinite;
-      color: var(--green);
-    }
+    .terminal-box { margin-top: .5rem; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; font-size: .8rem; }
+    .terminal-bar { background: #2d333b; padding: .45rem .75rem; display: flex; align-items: center; gap: .4rem; }
+    .t-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .t-title { margin-left: .5rem; color: var(--text-muted); font-size: .75rem; }
+    .terminal-body { background: #0d1117; padding: .85rem 1rem; min-height: 48px; color: var(--green); line-height: 1.6; }
+    .terminal-cursor { animation: blink 1s step-end infinite; color: var(--green); }
 
-    /* ── Tech Expand ── */
-    .tech-toggle {
-      display: flex;
-      align-items: center;
-      gap: .35rem;
-      font-size: .75rem;
-      color: var(--text-subtle);
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-family: 'JetBrains Mono', monospace;
-      padding: 0;
-      margin-top: .25rem;
-      transition: color .15s;
-    }
+    .tech-toggle { display: flex; align-items: center; gap: .35rem; font-size: .75rem; color: var(--text-subtle); background: none; border: none; cursor: pointer; font-family: 'JetBrains Mono', monospace; padding: 0; margin-top: .25rem; transition: color .15s; }
     .tech-toggle:hover { color: var(--text-muted); }
-    .tech-toggle .chevron {
-      display: inline-block;
-      transition: transform .25s ease;
-      font-style: normal;
-      line-height: 1;
-    }
+    .tech-toggle .chevron { display: inline-block; transition: transform .25s ease; font-style: normal; line-height: 1; }
     .tech-toggle.open .chevron { transform: rotate(90deg); }
-    .tech-expand {
-      display: grid;
-      grid-template-rows: 0fr;
-      transition: grid-template-rows .3s ease;
-    }
+    .tech-expand { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
     .tech-expand.open { grid-template-rows: 1fr; }
-    .tech-expand-inner {
-      overflow: hidden;
-    }
-    .tech-expand-body {
-      margin-top: .75rem;
-      padding: .85rem 1rem;
-      background: var(--bg-3);
-      border-radius: 4px;
-      border-left: 2px solid var(--accent);
-      font-size: .78rem;
-      color: var(--text-muted);
-      line-height: 1.7;
-    }
+    .tech-expand-inner { overflow: hidden; }
+    .tech-expand-body { margin-top: .75rem; padding: .85rem 1rem; background: var(--bg-3); border-radius: 4px; border-left: 2px solid var(--accent); font-size: .78rem; color: var(--text-muted); line-height: 1.7; }
     .tech-expand-body p { margin-bottom: .5rem; }
     .tech-expand-body p:last-child { margin-bottom: 0; }
     .tech-expand-body strong { color: var(--text); font-weight: 600; }
-    .tech-expand-body code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .72rem;
-      background: rgba(255,255,255,.06);
-      padding: .1rem .3rem;
-      border-radius: 3px;
-      color: var(--cyan);
-    }
+    .tech-expand-body code { font-family: 'JetBrains Mono', monospace; font-size: .72rem; background: rgba(255,255,255,.06); padding: .1rem .3rem; border-radius: 3px; color: var(--cyan); }
 
-    /* ── Sidebar ── */
     .sidebar { display: flex; flex-direction: column; gap: 1rem; }
-
-    .sidebar-box {
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 1rem 1.25rem;
-    }
-    .sidebar-box-title {
-      font-size: .78rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      margin-bottom: .85rem;
-    }
-
-    /* Tech stack */
+    .sidebar-box { background: var(--bg-2); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; }
+    .sidebar-box-title { font-size: .78rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: .85rem; }
     .tech-list { display: flex; flex-direction: column; gap: .5rem; }
-    .tech-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: .8rem;
-    }
-    .tech-name {
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-      color: var(--text-muted);
-    }
-    .tech-bar-wrap {
-      width: 80px;
-      height: 4px;
-      background: var(--bg-3);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .tech-bar {
-      height: 100%;
-      border-radius: 2px;
-      transition: width 1s ease;
-    }
+    .tech-item { display: flex; align-items: center; justify-content: space-between; font-size: .8rem; }
+    .tech-name { display: flex; align-items: center; gap: .5rem; color: var(--text-muted); }
+    .tech-bar-wrap { width: 80px; height: 4px; background: var(--bg-3); border-radius: 2px; overflow: hidden; }
+    .tech-bar { height: 100%; border-radius: 2px; transition: width 1s ease; }
 
-    /* Timeline */
     .timeline { display: flex; flex-direction: column; gap: 0; }
-    .timeline-item {
-      display: flex;
-      gap: .75rem;
-      padding-bottom: .85rem;
-      position: relative;
-    }
-    .timeline-item:not(:last-child)::before {
-      content: '';
-      position: absolute;
-      left: 6px;
-      top: 14px;
-      bottom: 0;
-      width: 1px;
-      background: var(--border);
-    }
-    .timeline-dot {
-      width: 13px; height: 13px;
-      border-radius: 50%;
-      border: 2px solid var(--border);
-      background: var(--bg-2);
-      flex-shrink: 0;
-      margin-top: 3px;
-    }
+    .timeline-item { display: flex; gap: .75rem; padding-bottom: .85rem; position: relative; }
+    .timeline-item:not(:last-child)::before { content: ''; position: absolute; left: 6px; top: 14px; bottom: 0; width: 1px; background: var(--border); }
+    .timeline-dot { width: 13px; height: 13px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg-2); flex-shrink: 0; margin-top: 3px; }
     .timeline-dot.done { border-color: var(--green); background: var(--green); }
     .timeline-dot.active { border-color: var(--accent); }
     .timeline-text { font-size: .78rem; color: var(--text-muted); line-height: 1.5; }
     .timeline-text strong { color: var(--text); font-weight: 600; font-size: .8rem; }
 
-    /* Stats */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: .5rem;
-    }
-    .stat-item {
-      background: var(--bg-3);
-      border-radius: 4px;
-      padding: .6rem .75rem;
-      text-align: center;
-    }
-    .stat-num {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text);
-      display: block;
-    }
-    .stat-label {
-      font-size: .68rem;
-      color: var(--text-subtle);
-      margin-top: .1rem;
-    }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+    .stat-item { background: var(--bg-3); border-radius: 4px; padding: .6rem .75rem; text-align: center; }
+    .stat-num { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--text); display: block; }
+    .stat-label { font-size: .68rem; color: var(--text-subtle); margin-top: .1rem; }
 
-    /* ── Footer ── */
-    footer {
-      border-top: 1px solid var(--border);
-      text-align: center;
-      padding: 2rem;
-      font-size: .75rem;
-      color: var(--text-subtle);
-      font-family: 'JetBrains Mono', monospace;
-    }
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 2rem; font-size: .75rem; color: var(--text-subtle); font-family: 'JetBrains Mono', monospace; }
     footer a { color: var(--text-muted); text-decoration: none; }
     footer a:hover { color: var(--accent-hover); }
 
-    /* ── Scroll top ── */
-    .scroll-top {
-      position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      width: 36px; height: 36px;
-      border-radius: 6px;
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: .9rem;
-      opacity: 0;
-      transform: translateY(8px);
-      transition: opacity .25s, transform .25s, border-color .15s;
-      z-index: 99;
-    }
+    .scroll-top { position: fixed; bottom: 1.5rem; right: 1.5rem; width: 36px; height: 36px; border-radius: 6px; background: var(--bg-2); border: 1px solid var(--border); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: .9rem; opacity: 0; transform: translateY(8px); transition: opacity .25s, transform .25s, border-color .15s; z-index: 99; }
     .scroll-top.show { opacity: 1; transform: translateY(0); }
     .scroll-top:hover { border-color: var(--accent); color: var(--accent-hover); }
 
-    /* ── Modal (對話框) ── */
-    dialog#tech-modal {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0;
-      background: var(--bg-2);
-      color: var(--text);
-      max-width: 400px;
-      width: 90%;
-      margin: auto;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-    dialog#tech-modal::backdrop {
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
-    }
-    .modal-content {
-      display: flex;
-      flex-direction: column;
-    }
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 1.25rem;
-      border-bottom: 1px solid var(--border);
-    }
-    #modal-title {
-      font-size: 1rem;
-      margin: 0;
-      color: var(--accent-hover);
-      font-family: 'JetBrains Mono', monospace;
-    }
-    #close-modal-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-size: 1.5rem;
-      cursor: pointer;
-      line-height: 1;
-      transition: color 0.2s;
-    }
-    #close-modal-btn:hover { 
-      color: var(--red); 
-    }
-    
-    /* ── 新增：對話框說明與連結樣式 ── */
-    .modal-desc {
-      padding: 1.25rem 1.25rem 0;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
-    .modal-repo-list {
-      list-style: none;
-      padding: 1.25rem;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 0.85rem;
-    }
-    .modal-repo-list li {
-      font-size: 0.85rem;
-      padding-left: 1.2rem;
-      position: relative;
-      color: var(--text-muted);
-    }
-    .modal-repo-list li::before {
-      content: '▹';
-      position: absolute;
-      left: 0;
-      color: var(--accent);
-    }
-    .modal-repo-list a {
-      color: var(--text);
-      text-decoration: none;
-      transition: color 0.15s;
-    }
-    .modal-repo-list a:hover {
-      color: var(--accent-hover);
-      text-decoration: underline;
-    }
+    dialog#tech-modal { border: 1px solid var(--border); border-radius: 8px; padding: 0; background: var(--bg-2); color: var(--text); max-width: 400px; width: 90%; margin: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    dialog#tech-modal::backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); }
+    .modal-content { display: flex; flex-direction: column; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); }
+    #modal-title { font-size: 1rem; margin: 0; color: var(--accent-hover); font-family: 'JetBrains Mono', monospace; }
+    #close-modal-btn { background: transparent; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; line-height: 1; transition: color 0.2s; }
+    #close-modal-btn:hover { color: var(--red); }
+    .modal-desc { padding: 1.25rem 1.25rem 0; font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+    .modal-repo-list { list-style: none; padding: 1.25rem; margin: 0; display: flex; flex-direction: column; gap: 0.85rem; }
+    .modal-repo-list li { font-size: 0.85rem; padding-left: 1.2rem; position: relative; color: var(--text-muted); }
+    .modal-repo-list li::before { content: '▹'; position: absolute; left: 0; color: var(--accent); }
+    .modal-repo-list a { color: var(--text); text-decoration: none; transition: color 0.15s; }
+    .modal-repo-list a:hover { color: var(--accent-hover); text-decoration: underline; }
 
-    /* ── Responsive ── */
     @media (max-width: 700px) {
       .main { grid-template-columns: 1fr; }
       .sidebar { order: -1; }
@@ -666,894 +246,779 @@
 </head>
 <body>
 
-<nav>
-  <div class="nav-logo">
-    <span class="prompt">~</span> feng-portfolio <span class="cursor"></span>
-  </div>
-  <ul class="nav-links">
-    <li><a href="#projects">專案</a></li>
-    <li><a href="https://github.com/chifeng-chiu" target="_blank">GitHub</a></li>
-  </ul>
-</nav>
+  <div id="game-view">
+    <div class="game-header">
+      <div class="game-title">~ feng-portfolio/init-quest $</div>
+      <div class="game-subtitle" id="game-subtitle">【 系統鎖定 】請收集散落的 8 個專案聖物來開啟傳送門</div>
+    </div>
 
-<div class="hero">
-  <div class="hero-top">
-    <div class="avatar">🧑‍💻</div>
-    <div class="hero-info">
-      <div class="hero-name">FENG</div>
-      <div class="hero-handle">@chifeng-chiu</div>
-      <div class="hero-bio">從 HTML/CSS 基礎到全端開發，記錄一學期的完整學習歷程。</div>
-      <div class="hero-meta">
-        <div class="hero-meta-item">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"/></svg>
-          2025 全學期作品
+    <div class="game-container">
+      <canvas id="gameCanvas" width="450" height="450"></canvas>
+      
+      <div class="hud">
+        <div class="hud-title">
+          <span>生命值</span>
+          <span class="lives-text" id="lives-text">❤️❤️❤️</span>
         </div>
-        <div class="hero-meta-item">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8V1.5Z"/></svg>
-          8 個作品
+        <div class="hud-title" style="margin-top:0.5rem;">
+          <span>收集進度</span>
+          <span class="progress-text" id="progress-text">0 / 8</span>
         </div>
-        <div class="hero-meta-item">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-          GitHub
-        </div>
+        <ul class="item-list" id="mission-list">
+          </ul>
+      </div>
+    </div>
+
+    <div class="d-pad">
+      <button class="d-btn" id="btn-up">↑</button>
+      <div class="d-row">
+        <button class="d-btn" id="btn-left">←</button>
+        <button class="d-btn" id="btn-down">↓</button>
+        <button class="d-btn" id="btn-right">→</button>
       </div>
     </div>
   </div>
-</div>
 
-<div class="tagcloud-section">
-  <div class="tagcloud-box">
-    <div class="tagcloud-header">
-      <span class="tagcloud-title">技術標籤雲 · 拖曳旋轉 · 點擊查看</span>
-      <span class="tagcloud-hint">drag & click</span>
-    </div>
-    <canvas id="tagcloud-canvas" width="860" height="260"></canvas>
-  </div>
-</div>
 
-<div class="main" id="projects">
-
-  <div>
-    <div class="section-title">
-      <span class="dot"></span>
-      專案作品
-    </div>
-
-    <div class="filter-row">
-      <button class="filter-btn active" data-filter="all">全部</button>
-      <button class="filter-btn" data-filter="frontend">前端</button>
-      <button class="filter-btn" data-filter="js">JavaScript</button>
-      <button class="filter-btn" data-filter="node">Node.js</button>
-      <button class="filter-btn" data-filter="python">Python</button>
-    </div>
-
-    <div class="repo-list">
-
-      <div class="repo-card" data-tags="frontend js">
-        <div class="repo-card-top">
-          <div class="repo-icon-name">
-            <span class="repo-icon">📸</span>
-            <a class="repo-name" href="../01/index.html" target="_blank">個人網站 + 相簿</a>
-          </div>
-          <span class="repo-badge">作業 01</span>
-        </div>
-        <div class="repo-desc">個人形象頁面搭配動態相簿，支援分類瀏覽（運動／攝影／旅遊），玻璃擬態設計與漸層主題。</div>
-        <div class="repo-footer">
-          <div class="repo-lang"><span class="lang-dot" style="background:#e34c26"></span> HTML/CSS</div>
-          <div class="repo-tags">
-            <span class="repo-tag">HTML5</span><span class="repo-tag">CSS3</span><span class="repo-tag">Vanilla JS</span>
-          </div>
-          <a class="repo-link" href="../01/index.html" target="_blank">前往 ↗</a>
-        </div>
-        <button class="tech-toggle" onclick="toggleTech(this)">
-          <i class="chevron">▶</i> 技術說明
-        </button>
-        <div class="tech-expand"><div class="tech-expand-inner"><div class="tech-expand-body">
-          <p>核心概念在於理解「資訊架構」如何影響使用者的瀏覽體驗。</p>
-          <p><strong>URL 路由雛型</strong>：透過 <code>?category=sports</code> 的 query string 決定載入哪個分類，這正是現代前端路由的最小實作。</p>
-          <p><strong>視覺設計</strong>：採用玻璃擬態（glassmorphism）與漸層背景，在無框架前提下達到接近設計工具的視覺品質。</p>
-          <p><strong>學習重點</strong>：如何用 HTML 標籤的層級對應內容層級，再用 CSS 賦予情緒與風格。</p>
-        </div></div></div>
+  <div id="portfolio-view">
+    <nav>
+      <div class="nav-logo">
+        <span class="prompt">~</span> feng-portfolio <span class="cursor"></span>
       </div>
-
-      <div class="repo-card" data-tags="frontend">
-        <div class="repo-card-top">
-          <div class="repo-icon-name">
-            <span class="repo-icon">📋</span>
-            <a class="repo-name" href="../02/index.html" target="_blank">生活習慣問卷</a>
-          </div>
-          <span class="repo-badge">作業 02</span>
-        </div>
-        <div class="repo-desc">多功能生活問卷，包含基本資料、生活型態、興趣偏好、回饋建議，實作用戶端驗證與表單處理。</div>
-        <div class="repo-footer">
-          <div class="repo-lang"><span class="lang-dot" style="background:#e34c26"></span> HTML/CSS</div>
-          <div class="repo-tags">
-            <span class="repo-tag">HTML5</span><span class="repo-tag">CSS3</span><span class="repo-tag">表單驗證</span>
-          </div>
-          <a class="repo-link" href="../02/index.html" target="_blank">前往 ↗</a>
-        </div>
-        <button class="tech-toggle" onclick="toggleTech(this)">
-          <i class="chevron">▶</i> 技術說明
-        </button>
-        <div class="tech-expand"><div class="tech-expand-inner"><div class="tech-expand-body">
-          <p><strong>表單的本質是資料的通道</strong>：每一次提交都是一條資料的產生命令。</p>
-          <p><strong>輸入類型設計</strong>：單選鈕代表排他性選擇，複選框代表並列愛好，文字區塊承載非結構化意見，每種類型都有其適用情境。</p>
-          <p><strong>驗證機制</strong>：用戶端驗證是資料的守門員，確保資料在離開前端之前已符合基本規範。</p>
-          <p><strong>學習重點</strong>：前端表單不是單純的 UI 元件集合，而是使用者意圖轉換為結構化資料的第一道關卡。</p>
-        </div></div></div>
-      </div>
-
-      <div class="repo-card" data-tags="node">
-        <div class="repo-card-top">
-          <div class="repo-icon-name">
-            <span class="repo-icon">🚀</span>
-            <a class="repo-name" href="https://github.com/chifeng-chiu" target="_blank">Node.js Hello World</a>
-          </div>
-          <span class="repo-badge">作業 03</span>
-        </div>
-        <div class="repo-desc">第一個 Node.js 程式，理解 JavaScript 在伺服器端的執行環境，為後續全端開發打下基礎。</div>
-        <div class="repo-footer">
-          <div class="repo-lang"><span class="lang-dot" style="background:#f1e05a"></span> JavaScript</div>
-          <div class="repo-tags"><span class="repo-tag">Node.js</span></div>
-          <button class="repo-link" style="background:none;border:none;cursor:pointer;font-family:inherit;" onclick="runTerminal(this)">▶ 執行看看</button>
-        </div>
-        <div class="terminal-box" style="display:none;">
-          <div class="terminal-bar"><span class="t-dot" style="background:#f85149"></span><span class="t-dot" style="background:#d29922"></span><span class="t-dot" style="background:#3fb950"></span><span class="t-title">node hello.js</span></div>
-          <div class="terminal-body"><span class="terminal-output"></span><span class="terminal-cursor">█</span></div>
-        </div>
-        <button class="tech-toggle" onclick="toggleTech(this)">
-          <i class="chevron">▶</i> 技術說明
-        </button>
-        <div class="tech-expand"><div class="tech-expand-inner"><div class="tech-expand-body">
-          <p><strong>觀念上的斷裂</strong>：JavaScript 不再只活在瀏覽器的 <code>&lt;script&gt;</code> 標籤裡，執行 <code>node hello.js</code> 代表「執行環境切換」這個關鍵能力。</p>
-          <p><strong>核心原理</strong>：Node.js 採用事件驅動的非阻塞 I/O 模型，雖然 Hello World 沒有展現非同步操作，但奠定了理解伺服器端開發的基礎。</p>
-          <p><strong>學習重點</strong>：理解在程式碼與作業系統之間，存在一個稱為「執行期環境」的中介層。</p>
-        </div></div></div>
-      </div>
-
-      <div class="repo-card" data-tags="js frontend">
-        <div class="repo-card-top">
-          <div class="repo-icon-name">
-            <span class="repo-icon">🧩</span>
-            <a class="repo-name" href="../04/index.html" target="_blank">JavaScript 十題練習</a>
-          </div>
-          <span class="repo-badge">作業 04</span>
-        </div>
-        <div class="repo-desc">涵蓋奇偶判斷、陣列處理、JSON 操作、篩選排序、字元頻率、反轉陣列、購物車模擬等十道互動練習。</div>
-        <div class="repo-footer">
-          <div class="repo-lang"><span class="lang-dot" style="background:#f1e05a"></span> JavaScript</div>
-          <div class="repo-tags">
-            <span class="repo-tag">HTML5</span><span class="repo-tag">CSS3</span><span class="repo-tag">Vanilla JS</span>
-          </div>
-          <a class="repo-link" href="../04/index.html" target="_blank">前往 ↗</a>
-        </div>
-        <button class="tech-toggle" onclick="toggleTech(this)">
-          <i class="chevron">▶</i> 技術說明
-        </button>
-        <div class="tech-expand"><div class="tech-expand-inner"><div class="tech-expand-body">
-          <p><strong>刻意練習策略</strong>：每題瞄準一個 JS 核心機制，而非單純語法訓練。</p>
-          <p><strong>重點概念</strong>：<code>reduce()</code> 的累積器模式、dot vs bracket notation 的「屬性即字串」本質、JSON 作為前後端資料交換格式。</p>
-          <p><strong>購物車模擬</strong>：商品新增、刪除、數量變更、折扣計算 — 這是狀態管理的最小模型，與電商網站的核心邏輯相同。</p>
-          <p><strong>學習重點</strong>：建立「將問題拆解為程式邏輯」的直覺。</p>
-        </div></div></div>
-      </div>
-
-      <div class="repo-card" data-tags="node">
-        <div class="repo-card-top">
-          <div class="repo-icon-name">
-            <span class="repo-icon">📝</span>
-            <a class="repo-name" href="../05/index.html" target="_blank">部落格系統</a>
-          </div>
-          <span class="repo-badge">作業 05</span>
-        </div>
-        <div class="repo-desc">完整部落格平台：用戶註冊／登入、文章 CRUD、分類篩選、全文搜尋、個人檔案頁面。Express + SQLite + EJS。</div>
-        <div class="repo-footer">
-          <div class="repo-lang"><span class="lang-dot" style="background:#3572A5"></span> Node.js</div>
-          <div class="repo-tags">
-            <span class="repo-tag">Express</span><span class="repo-tag">SQLite</span><span class="repo-tag">EJS</span><span class="repo-tag">bcrypt</span>
-          </div>
-          <a class="repo-link" href="../05/index.html" target="_blank">前往 ↗</a>
-        </div>
-        <button class="tech-toggle" onclick="toggleTech(this)">
-          <i class="chevron">▶</i> 技術說明
-        </button>
-        <div class="tech-expand"><div class="tech-expand-inner"><div class="tech-expand-body">
-          <p><strong>路由設計</strong>：Express 路由本質是「請求與處理器的配對表」，<code>app.get('/post/:id')</code> 體現 URL 參數化與 RESTful 設計哲學。</p>
-          <p><strong>MVC 架構</strong>：EJS 模板引擎讓每次請求走完「路由 → 資料查詢 → 模板渲染 → 回應 HTML」的完整循環。</p>
-          <p><strong>認證機制</strong>：bcrypt 雜湊 + express-session 展示如何在不信任的網路環境中建立信任，密碼不以明文儲存。</p>
-          <p><strong>學習重點</strong>：全端應用是「路由 + 資料庫 + 認證 + 視圖層」四者協作的問題，缺一不可。</p>
-        </div></div></div>
-      </div>
-
-      <div class="repo-card" data-tags="js frontend">
-        <div class="repo-card-top">
-          <div class="repo-icon-name">
-            <span class="repo-icon">⚡</span>
-            <a class="repo-name" href="../06/index.html" target="_blank">JS 函式學習中心</a>
-          </div>
-          <span class="repo-badge">作業 06</span>
-        </div>
-        <div class="repo-desc">雙模式函式學習工具：選擇題測驗 + 實作練習，涵蓋箭頭函式、閉包、IIFE、回呼、高階函式等核心概念。</div>
-        <div class="repo-footer">
-          <div class="repo-lang"><span class="lang-dot" style="background:#f1e05a"></span> JavaScript</div>
-          <div class="repo-tags">
-            <span class="repo-tag">HTML5</span><span class="repo-tag">CSS3</span><span class="repo-tag">Vanilla JS</span>
-          </div>
-          <a class="repo-link" href="../06/index.html" target="_blank">前往 ↗</a>
-        </div>
-        <button class="tech-toggle" onclick="toggleTech(this)">
-          <i class="chevron">▶</i> 技術說明
-        </button>
-        <div class="tech-expand"><div class="tech-expand-inner"><div class="tech-expand-body">
-          <p><strong>閉包（Closure）</strong>：函式能「記住」它被建立時的環境，即使那個環境已消失。這讓工廠函式、私有變數、部分應用等模式成為可能。</p>
-          <p><strong>IIFE</strong>：<code>(function(){ ... })()</code> 立即執行，建立隔離作用域，解決模組系統出現前的變數汙染問題。</p>
-          <p><strong>高階函式</strong>：<code>map</code>、<code>filter</code>、<code>reduce</code> 接受函式作為參數，讓資料轉換從命令式變成宣告式。</p>
-          <p><strong>學習重點</strong>：理解為什麼函式在 JavaScript 中「無所不在」的設計哲學。</p>
-        </div></div></div>
-      </div>
-
-      <div class="repo-card" data-tags="node js">
-        <div class="repo-card-top">
-          <div class="repo-icon-name">
-            <span class="repo-icon">🔧</span>
-            <a class="repo-name" href="../07/index.html" target="_blank">後端模式 JS 挑戰</a>
-          </div>
-          <span class="repo-badge">作業 07</span>
-        </div>
-        <div class="repo-desc">十題聚焦 Express / Node.js 後端開發模式的 JavaScript 練習：解構賦值、Error-First Callback、模擬資料庫查詢等。</div>
-        <div class="repo-footer">
-          <div class="repo-lang"><span class="lang-dot" style="background:#f1e05a"></span> JavaScript</div>
-          <div class="repo-tags">
-            <span class="repo-tag">Node.js</span><span class="repo-tag">Express</span><span class="repo-tag">Callback</span>
-          </div>
-          <a class="repo-link" href="../07/index.html" target="_blank">前往 ↗</a>
-        </div>
-        <button class="tech-toggle" onclick="toggleTech(this)">
-          <i class="chevron">▶</i> 技術說明
-        </button>
-        <div class="tech-expand"><div class="tech-expand-inner"><div class="tech-expand-body">
-          <p><strong>解構賦值</strong>：<code>const { title, content } = req.body</code> 不只是語法糖，體現「關注點分離」，只取需要的東西。</p>
-          <p><strong>Error-First Callback</strong>：Node.js 非正式標準 <code>if (err) return callback(err)</code>，強迫開發者先處理錯誤再處理資料，是穩健系統的第一原則。</p>
-          <p><strong>模擬資料庫查詢</strong>：用 <code>setTimeout</code> 模擬非同步 DB，隔離理解回呼流程控制而不需真正連接資料庫。</p>
-          <p><strong>學習重點</strong>：為作業 05 的 Express 程式碼提供語義上的「預習」，降低後端思維的門檻。</p>
-        </div></div></div>
-      </div>
-
-      <div class="repo-card" data-tags="python">
-        <div class="repo-card-top">
-          <div class="repo-icon-name">
-            <span class="repo-icon">📈</span>
-            <a class="repo-name" href="../期中/index.html" target="_blank">StockBoard 股市論壇</a>
-          </div>
-          <span class="repo-badge midterm">期中專案</span>
-        </div>
-        <div class="repo-desc">完整股票討論平台：用戶認證、發文留言、即時股價查詢（Yahoo Finance）、交易記錄、Line 圖表、關注用戶。</div>
-        <div class="repo-footer">
-          <div class="repo-lang"><span class="lang-dot" style="background:#3572A5"></span> Python</div>
-          <div class="repo-tags">
-            <span class="repo-tag">FastAPI</span><span class="repo-tag">SQLAlchemy</span><span class="repo-tag">yfinance</span><span class="repo-tag">Chart.js</span>
-          </div>
-          <a class="repo-link" href="../期中/index.html" target="_blank">前往 ↗</a>
-        </div>
-        <button class="tech-toggle" onclick="toggleTech(this)">
-          <i class="chevron">▶</i> 技術說明
-        </button>
-        <div class="tech-expand"><div class="tech-expand-inner"><div class="tech-expand-body">
-          <p><strong>FastAPI 非同步基因</strong>：<code>async def</code> 讓路由在等待 I/O 時讓出事件迴圈，不同於 Express 的事件循環模型，提供另一種並行思路。</p>
-          <p><strong>ORM 抽象</strong>：SQLAlchemy 將資料表映射為 Python 物件，<code>User</code>、<code>Post</code>、<code>TradeRecord</code> 之間的 foreign key 關聯反映真實世界的實體關係。</p>
-          <p><strong>外部 API 整合</strong>：yfinance 獲取 Yahoo Finance 即時股價，涉及如何處理外部服務的延遲與失敗的錯誤處理策略。</p>
-          <p><strong>SPA 架構</strong>：前端用 Vanilla JS 實作路由切換、狀態管理、API 呼叫，親身體驗框架究竟替你解決了哪些問題。</p>
-          <p><strong>學習重點</strong>：真正的全端開發是讓前後端透過 API 合約進行鬆散耦合的通訊。</p>
-        </div></div></div>
-      </div>
-
-    </div>
-  </div>
-
-  <div class="sidebar">
-
-    <div class="sidebar-box">
-      <div class="sidebar-box-title">本學期數據</div>
-      <div class="stats-grid">
-        <div class="stat-item">
-          <span class="stat-num">8</span>
-          <div class="stat-label">專案作品</div>
-        </div>
-        <div class="stat-item">
-          <span class="stat-num">3</span>
-          <div class="stat-label">技術棧</div>
-        </div>
-        <div class="stat-item">
-          <span class="stat-num">5+</span>
-          <div class="stat-label">語言 / 框架</div>
-        </div>
-        <div class="stat-item">
-          <span class="stat-num">1</span>
-          <div class="stat-label">學期旅程</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="sidebar-box">
-      <div class="sidebar-box-title">技術棧</div>
-      <div class="tech-list">
-        <div class="tech-item">
-          <div class="tech-name">
-            <span style="color:#e34c26">●</span> HTML / CSS
-          </div>
-          <div class="tech-bar-wrap">
-            <div class="tech-bar" style="width:0%;background:#e34c26" data-w="90%"></div>
-          </div>
-        </div>
-        <div class="tech-item">
-          <div class="tech-name">
-            <span style="color:#f1e05a">●</span> JavaScript
-          </div>
-          <div class="tech-bar-wrap">
-            <div class="tech-bar" style="width:0%;background:#f1e05a" data-w="75%"></div>
-          </div>
-        </div>
-        <div class="tech-item">
-          <div class="tech-name">
-            <span style="color:#3fb950">●</span> Node.js
-          </div>
-          <div class="tech-bar-wrap">
-            <div class="tech-bar" style="width:0%;background:#3fb950" data-w="60%"></div>
-          </div>
-        </div>
-        <div class="tech-item">
-          <div class="tech-name">
-            <span style="color:#3572A5">●</span> Python
-          </div>
-          <div class="tech-bar-wrap">
-            <div class="tech-bar" style="width:0%;background:#3572A5" data-w="45%"></div>
-          </div>
-        </div>
-        <div class="tech-item">
-          <div class="tech-name">
-            <span style="color:#a371f7">●</span> SQL
-          </div>
-          <div class="tech-bar-wrap">
-            <div class="tech-bar" style="width:0%;background:#a371f7" data-w="50%"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="sidebar-box">
-      <div class="sidebar-box-title">學習時間軸</div>
-      <div class="timeline">
-        <div class="timeline-item">
-          <div class="timeline-dot done"></div>
-          <div class="timeline-text"><strong>作業 01–02</strong><br>HTML/CSS 靜態前端基礎</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot done"></div>
-          <div class="timeline-text"><strong>作業 03</strong><br>Node.js 伺服器環境入門</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot done"></div>
-          <div class="timeline-text"><strong>作業 04–06</strong><br>JavaScript 核心語法與函式</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot done"></div>
-          <div class="timeline-text"><strong>作業 07</strong><br>後端模式 Express 思維</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot done"></div>
-          <div class="timeline-text"><strong>期中專案</strong><br>FastAPI + SQLAlchemy 全端實戰</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot active"></div>
-          <div class="timeline-text"><strong>期末作品集</strong><br>整合所有作品，持續優化中</div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<footer>
-  <p>© 2025 FENG &nbsp;·&nbsp; <a href="https://github.com/chifeng-chiu" target="_blank">github.com/chifeng-chiu</a></p>
-</footer>
-
-<dialog id="tech-modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3 id="modal-title">技術名稱</h3>
-      <button id="close-modal-btn">×</button>
-    </div>
-    <div id="modal-desc" class="modal-desc"></div>
-    <ul id="modal-list" class="modal-repo-list">
+      <ul class="nav-links">
+        <li><a href="#projects">專案</a></li>
+        <li><a href="https://github.com/chifeng-chiu" target="_blank">GitHub</a></li>
       </ul>
+    </nav>
+
+    <div class="hero">
+      <div class="hero-top">
+        <div class="avatar">🧑‍💻</div>
+        <div class="hero-info">
+          <div class="hero-name">FENG</div>
+          <div class="hero-handle">@chifeng-chiu</div>
+          <div class="hero-bio">從 HTML/CSS 基礎到全端開發，記錄一學期的完整學習歷程。</div>
+          <div class="hero-meta">
+            <div class="hero-meta-item">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"/></svg>
+              2025 全學期作品
+            </div>
+            <div class="hero-meta-item">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8V1.5Z"/></svg>
+              8 個作品
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tagcloud-section">
+      <div class="tagcloud-box">
+        <div class="tagcloud-header">
+          <span class="tagcloud-title">技術標籤雲 · 拖曳旋轉 · 點擊查看</span>
+          <span class="tagcloud-hint">drag & click</span>
+        </div>
+        <canvas id="tagcloud-canvas" width="860" height="260"></canvas>
+      </div>
+    </div>
+
+    <div class="main" id="projects">
+      <div>
+        <div class="section-title"><span class="dot"></span>專案作品</div>
+        <div class="filter-row">
+          <button class="filter-btn active" data-filter="all">全部</button>
+          <button class="filter-btn" data-filter="frontend">前端</button>
+          <button class="filter-btn" data-filter="js">JavaScript</button>
+          <button class="filter-btn" data-filter="node">Node.js</button>
+          <button class="filter-btn" data-filter="python">Python</button>
+        </div>
+
+        <div class="repo-list">
+          <div class="repo-card" data-tags="frontend js">
+            <div class="repo-card-top">
+              <div class="repo-icon-name"><span class="repo-icon">📸</span><a class="repo-name" href="../01/index.html" target="_blank">個人網站 + 相簿</a></div>
+              <span class="repo-badge">作業 01</span>
+            </div>
+            <div class="repo-desc">個人形象頁面搭配動態相簿，支援分類瀏覽，玻璃擬態設計與漸層主題。</div>
+            <div class="repo-footer">
+              <div class="repo-lang"><span class="lang-dot" style="background:#e34c26"></span> HTML/CSS</div>
+              <div class="repo-tags"><span class="repo-tag">HTML5</span><span class="repo-tag">CSS3</span><span class="repo-tag">Vanilla JS</span></div>
+              <a class="repo-link" href="../01/index.html" target="_blank">前往 ↗</a>
+            </div>
+          </div>
+          <div class="repo-card" data-tags="frontend">
+            <div class="repo-card-top">
+              <div class="repo-icon-name"><span class="repo-icon">📋</span><a class="repo-name" href="../02/index.html" target="_blank">生活習慣問卷</a></div>
+              <span class="repo-badge">作業 02</span>
+            </div>
+            <div class="repo-desc">多功能生活問卷，包含基本資料、生活型態、興趣偏好、回饋建議。</div>
+            <div class="repo-footer">
+              <div class="repo-lang"><span class="lang-dot" style="background:#e34c26"></span> HTML/CSS</div>
+              <div class="repo-tags"><span class="repo-tag">HTML5</span><span class="repo-tag">CSS3</span><span class="repo-tag">表單驗證</span></div>
+              <a class="repo-link" href="../02/index.html" target="_blank">前往 ↗</a>
+            </div>
+          </div>
+          <div class="repo-card" data-tags="node">
+            <div class="repo-card-top">
+              <div class="repo-icon-name"><span class="repo-icon">🚀</span><a class="repo-name" href="https://github.com/chifeng-chiu" target="_blank">Node.js Hello World</a></div>
+              <span class="repo-badge">作業 03</span>
+            </div>
+            <div class="repo-desc">第一個 Node.js 程式，理解 JavaScript 在伺服器端的執行環境。</div>
+            <div class="repo-footer">
+              <div class="repo-lang"><span class="lang-dot" style="background:#f1e05a"></span> JavaScript</div>
+              <div class="repo-tags"><span class="repo-tag">Node.js</span></div>
+              <button class="repo-link" style="background:none;border:none;cursor:pointer;font-family:inherit;" onclick="runTerminal(this)">▶ 執行看看</button>
+            </div>
+            <div class="terminal-box" style="display:none;">
+              <div class="terminal-bar"><span class="t-dot" style="background:#f85149"></span><span class="t-dot" style="background:#d29922"></span><span class="t-dot" style="background:#3fb950"></span><span class="t-title">node hello.js</span></div>
+              <div class="terminal-body"><span class="terminal-output"></span><span class="terminal-cursor">█</span></div>
+            </div>
+          </div>
+          <div class="repo-card" data-tags="js frontend">
+            <div class="repo-card-top">
+              <div class="repo-icon-name"><span class="repo-icon">🧩</span><a class="repo-name" href="../04/index.html" target="_blank">JavaScript 十題練習</a></div>
+              <span class="repo-badge">作業 04</span>
+            </div>
+            <div class="repo-desc">涵蓋陣列處理、JSON 操作、購物車模擬等十道互動練習。</div>
+            <div class="repo-footer">
+              <div class="repo-lang"><span class="lang-dot" style="background:#f1e05a"></span> JavaScript</div>
+              <div class="repo-tags"><span class="repo-tag">HTML5</span><span class="repo-tag">CSS3</span><span class="repo-tag">Vanilla JS</span></div>
+              <a class="repo-link" href="../04/index.html" target="_blank">前往 ↗</a>
+            </div>
+          </div>
+          <div class="repo-card" data-tags="node">
+            <div class="repo-card-top">
+              <div class="repo-icon-name"><span class="repo-icon">📝</span><a class="repo-name" href="../05/index.html" target="_blank">部落格系統</a></div>
+              <span class="repo-badge">作業 05</span>
+            </div>
+            <div class="repo-desc">完整部落格平台：用戶註冊／登入、文章 CRUD、分類篩選。Express + SQLite。</div>
+            <div class="repo-footer">
+              <div class="repo-lang"><span class="lang-dot" style="background:#3572A5"></span> Node.js</div>
+              <div class="repo-tags"><span class="repo-tag">Express</span><span class="repo-tag">SQLite</span><span class="repo-tag">EJS</span></div>
+              <a class="repo-link" href="../05/index.html" target="_blank">前往 ↗</a>
+            </div>
+          </div>
+          <div class="repo-card" data-tags="js frontend">
+            <div class="repo-card-top">
+              <div class="repo-icon-name"><span class="repo-icon">⚡</span><a class="repo-name" href="../06/index.html" target="_blank">JS 函式學習中心</a></div>
+              <span class="repo-badge">作業 06</span>
+            </div>
+            <div class="repo-desc">雙模式函式學習工具：涵蓋箭頭函式、閉包、IIFE、高階函式等核心概念。</div>
+            <div class="repo-footer">
+              <div class="repo-lang"><span class="lang-dot" style="background:#f1e05a"></span> JavaScript</div>
+              <div class="repo-tags"><span class="repo-tag">HTML5</span><span class="repo-tag">CSS3</span><span class="repo-tag">Vanilla JS</span></div>
+              <a class="repo-link" href="../06/index.html" target="_blank">前往 ↗</a>
+            </div>
+          </div>
+          <div class="repo-card" data-tags="node js">
+            <div class="repo-card-top">
+              <div class="repo-icon-name"><span class="repo-icon">🔧</span><a class="repo-name" href="../07/index.html" target="_blank">後端模式 JS 挑戰</a></div>
+              <span class="repo-badge">作業 07</span>
+            </div>
+            <div class="repo-desc">聚焦 Express / Node.js 後端開發模式的 JavaScript 練習。</div>
+            <div class="repo-footer">
+              <div class="repo-lang"><span class="lang-dot" style="background:#f1e05a"></span> JavaScript</div>
+              <div class="repo-tags"><span class="repo-tag">Node.js</span><span class="repo-tag">Express</span><span class="repo-tag">Callback</span></div>
+              <a class="repo-link" href="../07/index.html" target="_blank">前往 ↗</a>
+            </div>
+          </div>
+          <div class="repo-card" data-tags="python">
+            <div class="repo-card-top">
+              <div class="repo-icon-name"><span class="repo-icon">📈</span><a class="repo-name" href="../期中/index.html" target="_blank">StockBoard 股市論壇</a></div>
+              <span class="repo-badge midterm">期中專案</span>
+            </div>
+            <div class="repo-desc">完整股票討論平台：用戶認證、發文留言、即時股價查詢。</div>
+            <div class="repo-footer">
+              <div class="repo-lang"><span class="lang-dot" style="background:#3572A5"></span> Python</div>
+              <div class="repo-tags"><span class="repo-tag">FastAPI</span><span class="repo-tag">SQLAlchemy</span><span class="repo-tag">yfinance</span></div>
+              <a class="repo-link" href="../期中/index.html" target="_blank">前往 ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <div class="sidebar-box">
+          <div class="sidebar-box-title">本學期數據</div>
+          <div class="stats-grid">
+            <div class="stat-item"><span class="stat-num">8</span><div class="stat-label">專案作品</div></div>
+            <div class="stat-item"><span class="stat-num">3</span><div class="stat-label">技術棧</div></div>
+            <div class="stat-item"><span class="stat-num">5+</span><div class="stat-label">語言 / 框架</div></div>
+            <div class="stat-item"><span class="stat-num">1</span><div class="stat-label">學期旅程</div></div>
+          </div>
+        </div>
+
+        <div class="sidebar-box">
+          <div class="sidebar-box-title">技術棧</div>
+          <div class="tech-list">
+            <div class="tech-item"><div class="tech-name"><span style="color:#e34c26">●</span> HTML/CSS</div><div class="tech-bar-wrap"><div class="tech-bar" style="width:0%;background:#e34c26" data-w="90%"></div></div></div>
+            <div class="tech-item"><div class="tech-name"><span style="color:#f1e05a">●</span> JavaScript</div><div class="tech-bar-wrap"><div class="tech-bar" style="width:0%;background:#f1e05a" data-w="75%"></div></div></div>
+            <div class="tech-item"><div class="tech-name"><span style="color:#3fb950">●</span> Node.js</div><div class="tech-bar-wrap"><div class="tech-bar" style="width:0%;background:#3fb950" data-w="60%"></div></div></div>
+            <div class="tech-item"><div class="tech-name"><span style="color:#3572A5">●</span> Python</div><div class="tech-bar-wrap"><div class="tech-bar" style="width:0%;background:#3572A5" data-w="45%"></div></div></div>
+            <div class="tech-item"><div class="tech-name"><span style="color:#a371f7">●</span> SQL</div><div class="tech-bar-wrap"><div class="tech-bar" style="width:0%;background:#a371f7" data-w="50%"></div></div></div>
+          </div>
+        </div>
+
+        <div class="sidebar-box">
+          <div class="sidebar-box-title">學習時間軸</div>
+          <div class="timeline">
+            <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-text"><strong>作業 01–02</strong><br>HTML/CSS 靜態前端基礎</div></div>
+            <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-text"><strong>作業 03</strong><br>Node.js 伺服器環境入門</div></div>
+            <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-text"><strong>作業 04–06</strong><br>JavaScript 核心語法與函式</div></div>
+            <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-text"><strong>作業 07</strong><br>後端模式 Express 思維</div></div>
+            <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-text"><strong>期中專案</strong><br>FastAPI + SQLAlchemy 全端實戰</div></div>
+            <div class="timeline-item"><div class="timeline-dot active"></div><div class="timeline-text"><strong>期末作品集</strong><br>整合所有作品，持續優化中</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2025 FENG &nbsp;·&nbsp; <a href="https://github.com/chifeng-chiu" target="_blank">github.com/chifeng-chiu</a></p>
+    </footer>
+
+    <dialog id="tech-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modal-title">技術名稱</h3>
+          <button id="close-modal-btn">×</button>
+        </div>
+        <div id="modal-desc" class="modal-desc"></div>
+        <ul id="modal-list" class="modal-repo-list"></ul>
+      </div>
+    </dialog>
+
+    <button class="scroll-top" id="scrollTop" aria-label="回到頂部">↑</button>
   </div>
-</dialog>
 
-<button class="scroll-top" id="scrollTop" aria-label="回到頂部">↑</button>
-
-<script>
-  /* ── Terminal Animation ── */
-  function runTerminal(btn) {
-    const termBox = btn.closest('.repo-footer').nextElementSibling;
-    if (termBox.style.display === 'block') return;
-    termBox.style.display = 'block';
-    btn.style.display = 'none';
-
-    const output = termBox.querySelector('.terminal-output');
-    const cursor = termBox.querySelector('.terminal-cursor');
-    output.textContent = '';
-
-    const lines = [
-      { text: '$ node hello.js', color: '#7d8590', delay: 0 },
-      { text: '\nHello, World!',  color: '#3fb950', delay: 800 },
-      { text: '\n\n$ ',           color: '#7d8590', delay: 1400 },
-    ];
-
-    let totalDelay = 0;
-    lines.forEach(line => {
-      setTimeout(() => {
-        let i = 0;
-        const interval = setInterval(() => {
-          output.innerHTML += `<span style="color:${line.color}">${line.text[i] === '\n' ? '<br>' : line.text[i]}</span>`;
-          i++;
-          if (i >= line.text.length) clearInterval(interval);
-        }, 35);
-      }, line.delay);
-    });
-  }
-
-  /* ── Tech Toggle ── */
-  function toggleTech(btn) {
-    const expand = btn.nextElementSibling;
-    const isOpen = expand.classList.contains('open');
-    expand.classList.toggle('open', !isOpen);
-    btn.classList.toggle('open', !isOpen);
-    btn.childNodes[1].textContent = isOpen ? ' 技術說明' : ' 收起說明';
-  }
-
-  /* ── 3D Tag Cloud with Particle Effect & Click Event ── */
-  (function() {
-    const canvas = document.getElementById('tagcloud-canvas');
-    const ctx = canvas.getContext('2d');
-
-    function resize() {
-      const box = canvas.parentElement;
-      canvas.width = box.clientWidth - 40;
-      canvas.height = 260;
-    }
-    resize();
-    window.addEventListener('resize', () => { resize(); initTags(); });
-
-    const TAGS = [
-      { text: 'HTML5',        size: 20, color: '#e34c26' },
-      { text: 'CSS3',         size: 18, color: '#264de4' },
-      { text: 'JavaScript',   size: 22, color: '#f1e05a' },
-      { text: 'Node.js',      size: 20, color: '#3fb950' },
-      { text: 'Express',      size: 16, color: '#7d8590' },
-      { text: 'Python',       size: 20, color: '#3572A5' },
-      { text: 'FastAPI',      size: 17, color: '#009688' },
-      { text: 'SQLite',       size: 15, color: '#f472b6' },
-      { text: 'SQLAlchemy',   size: 14, color: '#a371f7' },
-      { text: 'EJS',          size: 14, color: '#7d8590' },
-      { text: 'bcrypt',       size: 13, color: '#58a6ff' },
-      { text: 'Chart.js',     size: 16, color: '#ff6384' },
-      { text: 'yfinance',     size: 13, color: '#ffa500' },
-      { text: 'Vanilla JS',   size: 15, color: '#f1e05a' },
-      { text: 'REST API',     size: 15, color: '#39d353' },
-      { text: 'CRUD',         size: 14, color: '#7d8590' },
-      { text: 'Glassmorphism',size: 12, color: '#a5b4fc' },
-      { text: 'Canvas',       size: 13, color: '#58a6ff' },
-      { text: 'Auth',         size: 14, color: '#f85149' },
-      { text: 'SPA',          size: 15, color: '#3fb950' },
-    ];
-
-    let particles = [];
-    class Particle {
-      constructor(x, y, color) {
-        this.x = x; this.y = y;
-        this.color = color;
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 3 + 1;
-        this.vx = Math.cos(angle) * speed;
-        this.vy = Math.sin(angle) * speed;
-        this.life = 1;
-        this.decay = Math.random() * 0.04 + 0.02;
-        this.size = Math.random() * 2.5 + 1;
-      }
-      update() {
-        this.x += this.vx; this.y += this.vy;
-        this.vy += 0.08; this.vx *= 0.97;
-        this.life -= this.decay;
-      }
-      draw() {
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, this.life);
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-    }
-
-    function spawnParticles(px, py, color, count = 18) {
-      for (let i = 0; i < count; i++) particles.push(new Particle(px, py, color));
-    }
-
-    let tags = [];
-    const R = 110;
-    let rotX = 0.3, rotY = 0.5;
-    let velX = 0.003, velY = 0.006;
-    let dragging = false, lastMX = 0, lastMY = 0;
+  <script>
+    // =========================================
+    // 🎮 遊戲邏輯區塊
+    // =========================================
     
-    let isClickDrag = false; 
-    let startX = 0, startY = 0; 
-    let mouseX = -999, mouseY = -999; 
-    let hoveredTag = null;
-    let clickedTag = null; 
+    // 👾 復活考驗題庫 (10 題隨機題)
+    const quizPool = [
+      { q: "HTML 代表什麼？", opts: ["Hyperlinks and Text Markup Language", "Hyper Text Markup Language", "Home Tool Markup Language", "Hyper Tool Markup Language"], ans: 2 },
+      { q: "CSS 的全名是？", opts: ["Cascading Style Sheets", "Creative Style Sheets", "Computer Style Sheets", "Colorful Style Sheets"], ans: 1 },
+      { q: "哪一個 HTML 標籤用來載入外部的 CSS 檔案？", opts: ["<style>", "<script>", "<link>", "<css>"], ans: 3 },
+      { q: "在 JavaScript 中，哪一個『不是』宣告變數的關鍵字？", opts: ["var", "let", "const", "def"], ans: 4 },
+      { q: "CSS 中，哪一個屬性用來改變文字顏色？", opts: ["text-color", "color", "font-color", "background-color"], ans: 2 },
+      { q: "JavaScript 是一種什麼樣的語言？", opts: ["靜態型別語言", "編譯型語言", "腳本語言", "組合語言"], ans: 3 },
+      { q: "<a> 標籤中，哪一個屬性用來指定超連結的目的地？", opts: ["href", "src", "link", "target"], ans: 1 },
+      { q: "以下哪一個是正確的 CSS 類別選擇器 (Class Selector)？", opts: ["#header", ".header", "header", "*header"], ans: 2 },
+      { q: "Node.js 的核心特性『不包含』下列何者？", opts: ["事件驅動 (Event-driven)", "非阻塞 I/O", "單執行緒 (Single Thread)", "DOM 操作"], ans: 4 },
+      { q: "「display: flex;」是什麼排版模型的語法？", opts: ["Grid", "Block", "Flexbox", "Inline"], ans: 3 }
+    ];
 
-    function initTags() {
-      tags = TAGS.map((t, i) => {
-        const phi = Math.acos(1 - 2 * (i + 0.5) / TAGS.length);
-        const theta = Math.PI * (1 + Math.sqrt(5)) * i;
-        return {
-          ...t,
-          x: Math.sin(phi) * Math.cos(theta),
-          y: Math.sin(phi) * Math.sin(theta),
-          z: Math.cos(phi)
-        };
+    const assignments = [
+      "作業 01：個人網站", "作業 02：生活習慣問卷", "作業 03：Node.js 入門",
+      "作業 04：JS十題練習", "作業 05：部落格系統", "作業 06：JS函式學習",
+      "作業 07：後端模式挑戰", "期中專案：股市論壇"
+    ];
+
+    let collectedCount = 0;
+    let lives = 3;
+    const listEl = document.getElementById('mission-list');
+    
+    function initMissionList() {
+      listEl.innerHTML = '';
+      assignments.forEach((name, idx) => {
+        const li = document.createElement('li');
+        li.className = 'item';
+        li.id = `item-${idx}`;
+        li.innerHTML = `<span class="item-icon"></span> ${name}`;
+        listEl.appendChild(li);
       });
     }
-    initTags();
+    initMissionList();
 
-    function rotatePoint(x, y, z) {
-      const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
-      let x1 = x * cosY - z * sinY;
-      let z1 = x * sinY + z * cosY;
-      const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
-      let y1 = y * cosX - z1 * sinX;
-      let z2 = y * sinX + z1 * cosX;
-      return { x: x1, y: y1, z: z2 };
-    }
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const TILE_SIZE = 30; 
 
-    function draw() {
-      const W = canvas.width, H = canvas.height;
-      const cx = W / 2, cy = H / 2;
-      ctx.clearRect(0, 0, W, H);
+    const originalMap = [
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 4, 0, 0, 1, 2, 0, 0, 0, 1, 0, 0, 2, 0, 1],
+      [1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1],
+      [1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
+      [1, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 2, 1, 0, 1],
+      [1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 1, 3, 1, 0, 0, 0, 0, 1],
+      [1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
+      [1, 0, 1, 2, 0, 0, 0, 1, 0, 0, 0, 0, 1, 2, 1],
+      [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
+      [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+      [1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    ];
 
-      particles = particles.filter(p => p.life > 0);
-      particles.forEach(p => { p.update(); p.draw(); });
+    let map = JSON.parse(JSON.stringify(originalMap));
 
-      const projected = tags.map(t => {
-        const p = rotatePoint(t.x, t.y, t.z);
-        const scale = (p.z + 2) / 3;
-        return { ...t, px: cx + p.x * R * 1.8, py: cy + p.y * R, scale, z: p.z };
-      }).sort((a, b) => a.z - b.z);
+    let player = { x: 1, y: 1 };
+    let portalUnlocked = false;
+    let gameWon = false;
+    let isFlashing = false; 
+    let isPaused = false; // 控制遊戲暫停 (跳出問答時使用)
 
-      let newHovered = null;
+    let monsters = [
+      { x: 4, y: 3, dx: 1, dy: 0 },  
+      { x: 9, y: 5, dx: -1, dy: 0 }, 
+      { x: 2, y: 11, dx: 1, dy: 0 }  
+    ];
 
-      projected.forEach(t => {
-        const alpha = 0.3 + 0.7 * t.scale;
-        const fontSize = Math.round(t.size * (0.6 + 0.5 * t.scale));
-        ctx.font = `600 ${fontSize}px 'JetBrains Mono', monospace`;
+    // 怪物移動定時器
+    let monsterTimer = setInterval(() => {
+      if(gameWon || isPaused) return;
+      
+      monsters.forEach(m => {
+        const directions = [ {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0} ];
+        const validMoves = directions.filter(d => {
+          const nx = m.x + d.dx;
+          const ny = m.y + d.dy;
+          return map[ny] && map[ny][nx] !== 1 && map[ny][nx] !== 3;
+        });
 
-        const tw = ctx.measureText(t.text).width;
-        const th = fontSize;
-        const isHovered = !dragging &&
-          mouseX > t.px - tw/2 - 6 && mouseX < t.px + tw/2 + 6 &&
-          mouseY > t.py - th/2 - 4 && mouseY < t.py + th/2 + 4;
-
-        if (isHovered) {
-          newHovered = t.text;
-          if (Math.random() < 0.4) spawnParticles(t.px, t.py, t.color, 3);
+        if (validMoves.length > 0) {
+          let chosen;
+          const currentDirValid = validMoves.find(d => d.dx === m.dx && d.dy === m.dy);
+          if (currentDirValid && Math.random() < 0.75) {
+            chosen = currentDirValid;
+          } else {
+            chosen = validMoves[Math.floor(Math.random() * validMoves.length)];
+          }
+          m.dx = chosen.dx; m.dy = chosen.dy;
+          m.x += m.dx; m.y += m.dy;
         }
-
-        ctx.save();
-        ctx.globalAlpha = isHovered ? 1 : alpha;
-        if (isHovered) {
-          ctx.shadowColor = t.color;
-          ctx.shadowBlur = 12;
-        }
-        ctx.fillStyle = t.color;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-
-        const drawScale = isHovered ? 1.2 : 1;
-        ctx.translate(t.px, t.py);
-        ctx.scale(drawScale, drawScale);
-        ctx.fillText(t.text, 0, 0);
-        ctx.restore();
       });
+      
+      checkCollision(); 
+      drawMap();
+    }, 400);
 
-      if (newHovered && newHovered !== hoveredTag) {
-        const t = projected.find(p => p.text === newHovered);
-        if (t) spawnParticles(t.px, t.py, t.color, 22);
-      }
-      hoveredTag = newHovered;
-      canvas.style.cursor = hoveredTag ? 'pointer' : (dragging ? 'grabbing' : 'grab');
+    // 完全重置遊戲
+    function gameOver() {
+      lives = 3;
+      collectedCount = 0;
+      portalUnlocked = false;
+      map = JSON.parse(JSON.stringify(originalMap));
+      player = { x: 1, y: 1 };
+      monsters = [
+        { x: 4, y: 3, dx: 1, dy: 0 }, { x: 9, y: 5, dx: -1, dy: 0 }, { x: 2, y: 11, dx: 1, dy: 0 }  
+      ];
+      document.getElementById('lives-text').innerText = '❤️❤️❤️';
+      document.getElementById('progress-text').innerText = '0 / 8';
+      initMissionList(); 
+      document.getElementById('game-subtitle').innerHTML = '【 系統鎖定 】請收集散落的 8 個專案聖物來開啟傳送門';
+      drawMap();
     }
 
-    function animate() {
-      if (!dragging) { rotY += velY; rotX += velX * 0.3; }
-      draw();
-      requestAnimationFrame(animate);
-    }
-    animate();
-
-    canvas.addEventListener('mousemove', e => {
-      const rect = canvas.getBoundingClientRect();
-      mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
-      mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
-      if (dragging) {
-        if (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5) {
-          isClickDrag = true;
-        }
-        rotY += (e.clientX - lastMX) * 0.01;
-        rotX += (e.clientY - lastMY) * 0.01;
-        lastMX = e.clientX; lastMY = e.clientY;
-      }
-    });
-    canvas.addEventListener('mouseleave', () => { mouseX = -999; mouseY = -999; });
-
-    canvas.addEventListener('mousedown', e => {
-      dragging = true;
-      isClickDrag = false;
-      lastMX = e.clientX; lastMY = e.clientY;
-      startX = e.clientX; startY = e.clientY;
-      clickedTag = hoveredTag; 
-    });
-    window.addEventListener('mouseup', () => { dragging = false; });
-
-    canvas.addEventListener('touchstart', e => {
-      dragging = true;
-      isClickDrag = false;
-      lastMX = e.touches[0].clientX; lastMY = e.touches[0].clientY;
-      startX = e.touches[0].clientX; startY = e.touches[0].clientY;
-      clickedTag = hoveredTag;
-    });
-    canvas.addEventListener('touchmove', e => {
-      e.preventDefault();
-      if (Math.abs(e.touches[0].clientX - startX) > 5 || Math.abs(e.touches[0].clientY - startY) > 5) {
-        isClickDrag = true;
-      }
-      rotY += (e.touches[0].clientX - lastMX) * 0.01;
-      rotX += (e.touches[0].clientY - lastMY) * 0.01;
-      lastMX = e.touches[0].clientX; lastMY = e.touches[0].clientY;
-    }, { passive: false });
-    canvas.addEventListener('touchend', () => { dragging = false; });
-
-    // === 對話框邏輯（含說明與超連結） ===
-    const projectsData = {
-      'HTML5': {
-        desc: '網頁的骨架，用來建立結構與內容，是前端開發的最基礎。',
-        projects: [
-          { name: '作業 01：個人網站 + 相簿', url: '../01/index.html' },
-          { name: '作業 02：生活習慣問卷', url: '../02/index.html' },
-          { name: '作業 04：JavaScript 十題練習', url: '../04/index.html' },
-          { name: '作業 06：JS 函式學習中心', url: '../06/index.html' }
-        ]
-      },
-      'CSS3': {
-        desc: '負責網頁的視覺呈現，包含排版、顏色、動畫與響應式設計。',
-        projects: [
-          { name: '作業 01：個人網站 + 相簿', url: '../01/index.html' },
-          { name: '作業 02：生活習慣問卷', url: '../02/index.html' },
-          { name: '作業 04：JavaScript 十題練習', url: '../04/index.html' },
-          { name: '作業 06：JS 函式學習中心', url: '../06/index.html' }
-        ]
-      },
-      'JavaScript': {
-        desc: '為網頁注入靈魂，處理使用者互動、非同步請求與動態 DOM 操作。',
-        projects: [
-          { name: '作業 03：Node.js Hello World', url: 'https://github.com/chifeng-chiu' },
-          { name: '作業 04：JavaScript 十題練習', url: '../04/index.html' },
-          { name: '作業 06：JS 函式學習中心', url: '../06/index.html' },
-          { name: '作業 07：後端模式 JS 挑戰', url: '../07/index.html' }
-        ]
-      },
-      'Node.js': {
-        desc: '讓 JavaScript 能在伺服器端執行的環境，適合建立高效能網路應用。',
-        projects: [
-          { name: '作業 03：Node.js Hello World', url: 'https://github.com/chifeng-chiu' },
-          { name: '作業 05：部落格系統', url: '../05/index.html' },
-          { name: '作業 07：後端模式 JS 挑戰', url: '../07/index.html' }
-        ]
-      },
-      'Express': {
-        desc: '輕量級的 Node.js 網頁框架，讓我們能快速建置路由與 API。',
-        projects: [
-          { name: '作業 05：部落格系統', url: '../05/index.html' },
-          { name: '作業 07：後端模式 JS 挑戰', url: '../07/index.html' }
-        ]
-      },
-      'Python': {
-        desc: '語法簡潔的後端與資料處理語言，是期中專案的核心。',
-        projects: [
-          { name: '期中專案：StockBoard 股市論壇', url: '../期中/index.html' }
-        ]
-      },
-      'FastAPI': {
-        desc: '現代且高效能的 Python 網頁框架，天生支援非同步與自動產生 API 文件。',
-        projects: [
-          { name: '期中專案：StockBoard 股市論壇', url: '../期中/index.html' }
-        ]
-      },
-      'SQLite': {
-        desc: '輕量級的關聯式資料庫，資料存取簡單，適合小型專案與開發測試。',
-        projects: [
-          { name: '作業 05：部落格系統', url: '../05/index.html' }
-        ]
-      },
-      'SQLAlchemy': {
-        desc: 'Python 的 ORM 套件，讓我們可以用物件導向的方式（寫程式碼）來操作資料庫。',
-        projects: [
-          { name: '期中專案：StockBoard 股市論壇', url: '../期中/index.html' }
-        ]
-      },
-      'EJS': {
-        desc: '將後端資料動態渲染進 HTML 的模板引擎。',
-        projects: [
-          { name: '作業 05：部落格系統', url: '../05/index.html' }
-        ]
-      },
-      'bcrypt': {
-        desc: '用於密碼雜湊加密的工具，保護使用者的敏感資訊安全。',
-        projects: [
-          { name: '作業 05：部落格系統', url: '../05/index.html' }
-        ]
-      },
-      'Chart.js': {
-        desc: '透過 JavaScript 繪製互動式圖表的視覺化工具。',
-        projects: [
-          { name: '期中專案：StockBoard 股市論壇', url: '../期中/index.html' }
-        ]
-      },
-      'yfinance': {
-        desc: '串接 Yahoo Finance 的 Python 套件，用來獲取即時股市資料。',
-        projects: [
-          { name: '期中專案：StockBoard 股市論壇', url: '../期中/index.html' }
-        ]
-      },
-      'Vanilla JS': {
-        desc: '原生 JavaScript，不依賴任何第三方框架，鍛鍊最扎實的程式邏輯。',
-        projects: [
-          { name: '作業 01：個人網站 + 相簿', url: '../01/index.html' },
-          { name: '作業 04：JavaScript 十題練習', url: '../04/index.html' },
-          { name: '作業 06：JS 函式學習中心', url: '../06/index.html' }
-        ]
-      },
-      'REST API': {
-        desc: '一種軟體架構風格，透過 HTTP 方法定義前後端資料交換的標準。',
-        projects: [
-          { name: '期中專案：StockBoard 股市論壇', url: '../期中/index.html' }
-        ]
-      },
-      'CRUD': {
-        desc: '建立 (Create)、讀取 (Read)、更新 (Update)、刪除 (Delete) 的資料庫四大基本操作。',
-        projects: [
-          { name: '作業 05：部落格系統', url: '../05/index.html' }
-        ]
-      },
-      'Glassmorphism': {
-        desc: '毛玻璃擬態設計風格，利用半透明與背景模糊創造現代感 UI。',
-        projects: [
-          { name: '作業 01：個人網站 + 相簿', url: '../01/index.html' }
-        ]
-      },
-      'Canvas': {
-        desc: 'HTML5 提供的繪圖 API，也就是用來畫這顆酷炫 3D 標籤雲與粒子特效的技術！',
-        projects: [
-          { name: '期末專案：FENG · 作品集', url: '#projects' }
-        ]
-      },
-      'Auth': {
-        desc: '身分驗證與授權機制，包含註冊、登入與狀態管理。',
-        projects: [
-          { name: '作業 05：部落格系統', url: '../05/index.html' },
-          { name: '期中專案：StockBoard 股市論壇', url: '../期中/index.html' }
-        ]
-      },
-      'SPA': {
-        desc: '單頁應用程式 (Single Page Application)，在前端動態切換內容，不需重新載入整個網頁。',
-        projects: [
-          { name: '期中專案：StockBoard 股市論壇', url: '../期中/index.html' }
-        ]
-      }
-    };
-
-    const techModal = document.getElementById('tech-modal');
-    const modalTitle = document.getElementById('modal-title');
-    const modalDesc = document.getElementById('modal-desc'); 
-    const modalList = document.getElementById('modal-list');
-    const closeModalBtn = document.getElementById('close-modal-btn');
-
-    canvas.addEventListener('click', () => {
-      if (clickedTag && !isClickDrag) {
-        modalTitle.textContent = `< ${clickedTag} />`;
-        modalList.innerHTML = '';
-        modalDesc.textContent = ''; 
+    // 👾 復活答題機制
+    function askReviveQuestion() {
+      // 確保遊戲畫面已經暫停並更新
+      setTimeout(() => {
+        const q = quizPool[Math.floor(Math.random() * quizPool.length)];
+        const msg = `【 復活考驗 】\n答對即可恢復 3 條命並保留目前的進度，答錯或取消則全部重置！\n\nQ: ${q.q}\n\n${q.opts.map((opt, i) => `${i+1}. ${opt}`).join('\n')}\n\n請輸入正確選項的數字 (1~4)：`;
         
-        const techInfo = projectsData[clickedTag];
+        let ans = prompt(msg);
         
-        if (techInfo) {
-          modalDesc.textContent = techInfo.desc;
-          
-          techInfo.projects.forEach(proj => {
-            const li = document.createElement('li');
-            const a = document.createElement('a');
-            a.href = proj.url;
-            a.target = '_blank'; 
-            a.textContent = proj.name;
-            
-            li.appendChild(a);
-            modalList.appendChild(li);
-          });
+        if (ans === null) {
+          alert("放棄復活，迷宮重置。");
+          gameOver();
+        } else if (parseInt(ans) === q.ans) {
+          alert("🎉 答對了！復活成功，繼續挑戰吧！");
+          lives = 3;
+          document.getElementById('lives-text').innerText = '❤️❤️❤️';
+          document.getElementById('game-subtitle').innerHTML = '【 系統鎖定 】請收集散落的 8 個專案聖物來開啟傳送門';
+          drawMap();
         } else {
-          modalDesc.textContent = '暫無詳細說明。';
-          const li = document.createElement('li');
-          li.textContent = '目前沒有記錄到相關作業';
-          modalList.appendChild(li);
+          alert(`❌ 答錯了！正確答案是 ${q.ans}。迷宮重置。`);
+          gameOver();
         }
         
-        techModal.showModal();
+        // 恢復遊戲運行
+        isPaused = false; 
+      }, 50);
+    }
+
+    // 檢查玩家與怪物碰撞
+    function checkCollision() {
+      // 【無敵機制】：如果傳送門開了，碰到怪物也不會有事
+      if (portalUnlocked) return; 
+
+      let hit = monsters.some(m => m.x === player.x && m.y === player.y);
+      if (hit) {
+        lives--;
+        player.x = 1; 
+        player.y = 1;
+        isFlashing = true; 
+
+        const hearts = '❤️'.repeat(lives) + '🖤'.repeat(3 - lives);
+        document.getElementById('lives-text').innerText = hearts;
+        const subtitle = document.getElementById('game-subtitle');
+
+        if (lives > 0) {
+          subtitle.innerHTML = '【 警告 】<span style="color:var(--red); font-weight:bold;">遭到怪物攻擊！扣除一命，返回起點！</span>';
+          setTimeout(() => { isFlashing = false; drawMap(); }, 300);
+          setTimeout(() => {
+            if(!gameWon && lives > 0) subtitle.innerText = '【 系統鎖定 】請收集散落的 8 個專案聖物來開啟傳送門';
+          }, 2000);
+        } else {
+          // 生命歸零，進入暫停與復活環節
+          isPaused = true; 
+          subtitle.innerHTML = '【 失敗 】<span style="color:var(--red); font-weight:bold;">生命值耗盡，準備進入復活考驗...</span>';
+          setTimeout(() => {
+            isFlashing = false;
+            drawMap();
+            askReviveQuestion(); // 呼叫答題視窗
+          }, 400); 
+        }
       }
-    });
+    }
 
-    closeModalBtn.addEventListener('click', () => { techModal.close(); });
-    techModal.addEventListener('click', (e) => {
-      const rect = techModal.getBoundingClientRect();
-      if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
-        techModal.close();
+    function drawMap() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      for (let y = 0; y < 15; y++) {
+        for (let x = 0; x < 15; x++) {
+          const tile = map[y][x];
+          const px = x * TILE_SIZE, py = y * TILE_SIZE;
+          if (tile === 1) {
+            ctx.fillStyle = '#30363d'; ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+            ctx.strokeStyle = '#21262d'; ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
+          } else if (tile === 2) {
+            ctx.fillStyle = '#3fb950'; ctx.shadowColor = '#3fb950'; ctx.shadowBlur = 10;
+            ctx.beginPath(); ctx.arc(px + TILE_SIZE/2, py + TILE_SIZE/2, 6, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowBlur = 0;
+          } else if (tile === 3) {
+            if (portalUnlocked) {
+              ctx.fillStyle = '#2f81f7'; ctx.shadowColor = '#2f81f7'; ctx.shadowBlur = 15;
+              ctx.fillRect(px + 2, py + 2, TILE_SIZE - 4, TILE_SIZE - 4); ctx.shadowBlur = 0;
+            } else {
+              ctx.fillStyle = '#0d1117'; ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+            }
+          }
+        }
       }
-    });
 
-  })();
-
-  /* ── Tech bar animation ── */
-  const bars = document.querySelectorAll('.tech-bar[data-w]');
-  const barObserver = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        setTimeout(() => { e.target.style.width = e.target.dataset.w; }, 200);
-        barObserver.unobserve(e.target);
-      }
-    });
-  }, { threshold: .5 });
-  bars.forEach(b => barObserver.observe(b));
-
-  /* ── Card entrance ── */
-  const cards = document.querySelectorAll('.repo-card');
-  const cardObserver = new IntersectionObserver(entries => {
-    entries.forEach((e, i) => {
-      if (e.isIntersecting) {
-        setTimeout(() => e.target.classList.add('visible'), i * 50);
-        cardObserver.unobserve(e.target);
-      }
-    });
-  }, { threshold: .08 });
-  cards.forEach(c => cardObserver.observe(c));
-
-  /* ── Filter ── */
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const filter = btn.dataset.filter;
-      cards.forEach(card => {
-        const tags = (card.dataset.tags || '').split(' ');
-        const show = filter === 'all' || tags.includes(filter);
-        card.style.display = show ? '' : 'none';
-        if (show) setTimeout(() => card.classList.add('visible'), 30);
+      ctx.font = '20px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      monsters.forEach(m => {
+        // 如果玩家處於無敵狀態，怪物可以稍微變透明一點作為視覺提示
+        if(portalUnlocked) ctx.globalAlpha = 0.4;
+        ctx.fillText('👾', m.x * TILE_SIZE + TILE_SIZE/2, m.y * TILE_SIZE + TILE_SIZE/2 + 2);
+        ctx.globalAlpha = 1;
       });
-    });
-  });
 
-  /* ── Scroll top ── */
-  const scrollBtn = document.getElementById('scrollTop');
-  window.addEventListener('scroll', () => {
-    scrollBtn.classList.toggle('show', window.scrollY > 300);
-  });
-  scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-</script>
+      // 如果傳送門開啟（無敵），幫玩家加一點發光效果
+      if (portalUnlocked) {
+        ctx.shadowColor = '#f1e05a'; ctx.shadowBlur = 15;
+      }
+      ctx.fillText('🧑‍💻', player.x * TILE_SIZE + TILE_SIZE/2, player.y * TILE_SIZE + TILE_SIZE/2 + 2);
+      ctx.shadowBlur = 0;
+
+      if (isFlashing) {
+        ctx.fillStyle = 'rgba(248, 81, 73, 0.4)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    function movePlayer(dx, dy) {
+      if(gameWon || isPaused) return;
+      const nx = player.x + dx, ny = player.y + dy;
+      
+      if (map[ny][nx] === 1) return;
+      if (map[ny][nx] === 3 && !portalUnlocked) return;
+
+      player.x = nx; player.y = ny;
+
+      if (map[ny][nx] === 2) { map[ny][nx] = 0; unlockItem(); }
+      
+      if (map[ny][nx] === 3 && portalUnlocked) { 
+        triggerWin(); 
+        return; 
+      }
+
+      checkCollision(); 
+      drawMap();
+    }
+
+    function unlockItem() {
+      const itemEl = document.getElementById(`item-${collectedCount}`);
+      if (itemEl) itemEl.classList.add('unlocked');
+      collectedCount++;
+      document.getElementById('progress-text').innerText = `${collectedCount} / 8`;
+      
+      // 當收集到 8 個時，開啟無敵與傳送門
+      if (collectedCount === 8) {
+        portalUnlocked = true;
+        document.getElementById('game-subtitle').innerHTML = '【 系統提示 】<span style="color:var(--green); font-weight:bold;">已獲得無敵狀態！中央傳送門已開啟！</span>';
+        setTimeout(() => alert('【 系統提示 】8 項專案收集完畢，已獲得無敵狀態，快前往中央傳送門吧！'), 100);
+      }
+    }
+
+    function triggerWin() {
+      gameWon = true;
+      const gameView = document.getElementById('game-view');
+      const portView = document.getElementById('portfolio-view');
+      
+      gameView.style.opacity = '0';
+      
+      setTimeout(() => {
+        gameView.style.display = 'none';
+        portView.style.display = 'block';
+        portView.offsetHeight; 
+        portView.style.opacity = '1';
+        initPortfolioScripts();
+      }, 1000);
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if(gameWon || isPaused) return;
+      if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].indexOf(e.code) > -1) e.preventDefault();
+      if (e.key === 'ArrowUp' || e.key === 'w') movePlayer(0, -1);
+      if (e.key === 'ArrowDown' || e.key === 's') movePlayer(0, 1);
+      if (e.key === 'ArrowLeft' || e.key === 'a') movePlayer(-1, 0);
+      if (e.key === 'ArrowRight' || e.key === 'd') movePlayer(1, 0);
+    });
+
+    document.getElementById('btn-up').addEventListener('click', () => movePlayer(0, -1));
+    document.getElementById('btn-down').addEventListener('click', () => movePlayer(0, 1));
+    document.getElementById('btn-left').addEventListener('click', () => movePlayer(-1, 0));
+    document.getElementById('btn-right').addEventListener('click', () => movePlayer(1, 0));
+
+    drawMap(); 
+
+    // =========================================
+    // 🚀 作品集互動邏輯區塊 (延後至破關後初始化)
+    // =========================================
+    
+    function runTerminal(btn) {
+      const termBox = btn.closest('.repo-footer').nextElementSibling;
+      if (termBox.style.display === 'block') return;
+      termBox.style.display = 'block';
+      btn.style.display = 'none';
+      const output = termBox.querySelector('.terminal-output');
+      output.textContent = '';
+      const lines = [
+        { text: '$ node hello.js', color: '#7d8590', delay: 0 },
+        { text: '\nHello, World!',  color: '#3fb950', delay: 800 },
+        { text: '\n\n$ ',           color: '#7d8590', delay: 1400 },
+      ];
+      lines.forEach(line => {
+        setTimeout(() => {
+          let i = 0;
+          const interval = setInterval(() => {
+            output.innerHTML += `<span style="color:${line.color}">${line.text[i] === '\n' ? '<br>' : line.text[i]}</span>`;
+            i++;
+            if (i >= line.text.length) clearInterval(interval);
+          }, 35);
+        }, line.delay);
+      });
+    }
+
+    function initPortfolioScripts() {
+      const canvas = document.getElementById('tagcloud-canvas');
+      const ctx = canvas.getContext('2d');
+      function resize() {
+        const box = canvas.parentElement;
+        canvas.width = box.clientWidth - 40;
+        canvas.height = 260;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      const TAGS = [
+        { text: 'HTML5', size: 20, color: '#e34c26' }, { text: 'CSS3', size: 18, color: '#264de4' },
+        { text: 'JavaScript', size: 22, color: '#f1e05a' }, { text: 'Node.js', size: 20, color: '#3fb950' },
+        { text: 'Express', size: 16, color: '#7d8590' }, { text: 'Python', size: 20, color: '#3572A5' },
+        { text: 'FastAPI', size: 17, color: '#009688' }, { text: 'SQLite', size: 15, color: '#f472b6' },
+        { text: 'SQLAlchemy', size: 14, color: '#a371f7' }, { text: 'EJS', size: 14, color: '#7d8590' },
+        { text: 'Vanilla JS', size: 15, color: '#f1e05a' }, { text: 'SPA', size: 15, color: '#3fb950' }
+      ];
+
+      let tags = [];
+      const R = 110;
+      let rotX = 0.3, rotY = 0.5, velX = 0.003, velY = 0.006;
+      let dragging = false, lastMX = 0, lastMY = 0, mouseX = -999, mouseY = -999;
+      let hoveredTag = null, clickedTag = null, isClickDrag = false, startX = 0, startY = 0;
+
+      function initTags() {
+        tags = TAGS.map((t, i) => {
+          const phi = Math.acos(1 - 2 * (i + 0.5) / TAGS.length);
+          const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+          return { ...t, x: Math.sin(phi) * Math.cos(theta), y: Math.sin(phi) * Math.sin(theta), z: Math.cos(phi) };
+        });
+      }
+      initTags();
+      window.addEventListener('resize', initTags);
+
+      function rotatePoint(x, y, z) {
+        const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+        let x1 = x * cosY - z * sinY, z1 = x * sinY + z * cosY;
+        const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+        return { x: x1, y: y * cosX - z1 * sinX, z: y * sinX + z1 * cosX };
+      }
+
+      function draw() {
+        const cx = canvas.width / 2, cy = canvas.height / 2;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        const projected = tags.map(t => {
+          const p = rotatePoint(t.x, t.y, t.z);
+          return { ...t, px: cx + p.x * R * 1.8, py: cy + p.y * R, scale: (p.z + 2) / 3, z: p.z };
+        }).sort((a, b) => a.z - b.z);
+
+        let newHovered = null;
+        projected.forEach(t => {
+          const alpha = 0.3 + 0.7 * t.scale, fontSize = Math.round(t.size * (0.6 + 0.5 * t.scale));
+          ctx.font = `600 ${fontSize}px 'JetBrains Mono', monospace`;
+          
+          const tw = ctx.measureText(t.text).width, th = fontSize;
+          const isHovered = !dragging && mouseX > t.px - tw/2 - 6 && mouseX < t.px + tw/2 + 6 && mouseY > t.py - th/2 - 4 && mouseY < t.py + th/2 + 4;
+          if (isHovered) newHovered = t.text;
+
+          ctx.save();
+          ctx.globalAlpha = isHovered ? 1 : alpha;
+          if (isHovered) { ctx.shadowColor = t.color; ctx.shadowBlur = 12; }
+          ctx.fillStyle = t.color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          const drawScale = isHovered ? 1.2 : 1;
+          ctx.translate(t.px, t.py); ctx.scale(drawScale, drawScale);
+          ctx.fillText(t.text, 0, 0);
+          ctx.restore();
+        });
+
+        hoveredTag = newHovered;
+        canvas.style.cursor = hoveredTag ? 'pointer' : (dragging ? 'grabbing' : 'grab');
+      }
+
+      function animate() {
+        if (!dragging) { rotY += velY; rotX += velX * 0.3; }
+        draw();
+        if(document.getElementById('portfolio-view').style.display === 'block'){
+          requestAnimationFrame(animate);
+        }
+      }
+      animate();
+
+      canvas.addEventListener('mousemove', e => {
+        const rect = canvas.getBoundingClientRect();
+        mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+        mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+        if (dragging) {
+          if (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5) isClickDrag = true;
+          rotY += (e.clientX - lastMX) * 0.01; rotX += (e.clientY - lastMY) * 0.01;
+          lastMX = e.clientX; lastMY = e.clientY;
+        }
+      });
+      canvas.addEventListener('mouseleave', () => { mouseX = -999; mouseY = -999; });
+      canvas.addEventListener('mousedown', e => {
+        dragging = true; isClickDrag = false;
+        lastMX = e.clientX; lastMY = e.clientY; startX = e.clientX; startY = e.clientY;
+        clickedTag = hoveredTag; 
+      });
+      window.addEventListener('mouseup', () => { dragging = false; });
+
+      // === 補回的對話框資料庫與點擊事件 ===
+      const projectsData = {
+        'HTML5': { desc: '網頁的骨架，用來建立結構與內容，是前端開發的最基礎。', projects: [ { name: '作業 01：個人網站 + 相簿', url: '../01/index.html' }, { name: '作業 02：生活習慣問卷', url: '../02/index.html' }, { name: '作業 04：JavaScript 十題練習', url: '../04/index.html' }, { name: '作業 06：JS 函式學習中心', url: '../06/index.html' } ] },
+        'CSS3': { desc: '負責網頁的視覺呈現，包含排版、顏色、動畫與響應式設計。', projects: [ { name: '作業 01：個人網站 + 相簿', url: '../01/index.html' }, { name: '作業 02：生活習慣問卷', url: '../02/index.html' }, { name: '作業 04：JavaScript 十題練習', url: '../04/index.html' }, { name: '作業 06：JS 函式學習中心', url: '../06/index.html' } ] },
+        'JavaScript': { desc: '為網頁注入靈魂，處理使用者互動、非同步請求與動態 DOM 操作。', projects: [ { name: '作業 03：Node.js Hello World', url: 'https://github.com/chifeng-chiu' }, { name: '作業 04：JavaScript 十題練習', url: '../04/index.html' }, { name: '作業 06：JS 函式學習中心', url: '../06/index.html' }, { name: '作業 07：後端模式 JS 挑戰', url: '../07/index.html' } ] },
+        'Node.js': { desc: '讓 JavaScript 能在伺服器端執行的環境，適合建立高效能網路應用。', projects: [ { name: '作業 03：Node.js Hello World', url: 'https://github.com/chifeng-chiu' }, { name: '作業 05：部落格系統', url: '../05/index.html' }, { name: '作業 07：後端模式 JS 挑戰', url: '../07/index.html' } ] },
+        'Express': { desc: '輕量級的 Node.js 網頁框架，讓我們能快速建置路由與 API。', projects: [ { name: '作業 05：部落格系統', url: '../05/index.html' }, { name: '作業 07：後端模式 JS 挑戰', url: '../07/index.html' } ] },
+        'Python': { desc: '語法簡潔的後端與資料處理語言，是期中專案的核心。', projects: [ { name: '期中專案：StockBoard 股市論壇', url: '../期中/index.html' } ] },
+        'FastAPI': { desc: '現代且高效能的 Python 網頁框架，天生支援非同步與自動產生 API 文件。', projects: [ { name: '期中專案：StockBoard 股市論壇', url: '../期中/index.html' } ] },
+        'SQLite': { desc: '輕量級的關聯式資料庫，資料存取簡單，適合小型專案與開發測試。', projects: [ { name: '作業 05：部落格系統', url: '../05/index.html' } ] },
+        'SQLAlchemy': { desc: 'Python 的 ORM 套件，讓我們可以用物件導向的方式（寫程式碼）來操作資料庫。', projects: [ { name: '期中專案：StockBoard 股市論壇', url: '../期中/index.html' } ] },
+        'EJS': { desc: '將後端資料動態渲染進 HTML 的模板引擎。', projects: [ { name: '作業 05：部落格系統', url: '../05/index.html' } ] },
+        'Vanilla JS': { desc: '原生 JavaScript，不依賴任何第三方框架，鍛鍊最扎實的程式邏輯。', projects: [ { name: '作業 01：個人網站 + 相簿', url: '../01/index.html' }, { name: '作業 04：JavaScript 十題練習', url: '../04/index.html' }, { name: '作業 06：JS 函式學習中心', url: '../06/index.html' } ] },
+        'SPA': { desc: '單頁應用程式 (Single Page Application)，在前端動態切換內容，不需重新載入整個網頁。', projects: [ { name: '期中專案：StockBoard 股市論壇', url: '../期中/index.html' } ] }
+      };
+
+      const techModal = document.getElementById('tech-modal');
+      const modalTitle = document.getElementById('modal-title');
+      const modalDesc = document.getElementById('modal-desc'); 
+      const modalList = document.getElementById('modal-list');
+      const closeModalBtn = document.getElementById('close-modal-btn');
+
+      canvas.addEventListener('click', () => {
+        if (clickedTag && !isClickDrag) {
+          modalTitle.textContent = `< ${clickedTag} />`;
+          modalList.innerHTML = '';
+          modalDesc.textContent = ''; 
+          
+          const techInfo = projectsData[clickedTag];
+          
+          if (techInfo) {
+            modalDesc.textContent = techInfo.desc;
+            techInfo.projects.forEach(proj => {
+              const li = document.createElement('li');
+              const a = document.createElement('a');
+              a.href = proj.url;
+              a.target = '_blank'; 
+              a.textContent = proj.name;
+              li.appendChild(a);
+              modalList.appendChild(li);
+            });
+          } else {
+            modalDesc.textContent = '暫無詳細說明。';
+            const li = document.createElement('li');
+            li.textContent = '目前沒有記錄到相關作業';
+            modalList.appendChild(li);
+          }
+          techModal.showModal();
+        }
+      });
+
+      closeModalBtn.addEventListener('click', () => { techModal.close(); });
+      techModal.addEventListener('click', (e) => {
+        const rect = techModal.getBoundingClientRect();
+        if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
+          techModal.close();
+        }
+      });
+      // === 補回區塊結束 ===
+
+      const bars = document.querySelectorAll('.tech-bar[data-w]');
+      const barObserver = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            setTimeout(() => { e.target.style.width = e.target.dataset.w; }, 200);
+            barObserver.unobserve(e.target);
+          }
+        });
+      }, { threshold: .5 });
+      bars.forEach(b => barObserver.observe(b));
+
+      const cards = document.querySelectorAll('.repo-card');
+      const cardObserver = new IntersectionObserver(entries => {
+        entries.forEach((e, i) => {
+          if (e.isIntersecting) {
+            setTimeout(() => e.target.classList.add('visible'), i * 50);
+            cardObserver.unobserve(e.target);
+          }
+        });
+      }, { threshold: .08 });
+      cards.forEach(c => cardObserver.observe(c));
+
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const filter = btn.dataset.filter;
+          cards.forEach(card => {
+            const tags = (card.dataset.tags || '').split(' ');
+            const show = filter === 'all' || tags.includes(filter);
+            card.style.display = show ? '' : 'none';
+            if (show) setTimeout(() => card.classList.add('visible'), 30);
+          });
+        });
+      });
+
+      const scrollBtn = document.getElementById('scrollTop');
+      window.addEventListener('scroll', () => { scrollBtn.classList.toggle('show', window.scrollY > 300); });
+      scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    }
+  </script>
 </body>
 </html>
