@@ -8,45 +8,74 @@
 </head>
 <body>
   <header>
-    <nav>
-      <h1>我的部落格</h1>
-      <ul>
-        <% if (user) { %>
-          <li><a href="/">首頁</a></li>
-          <li><a href="/new" class="btn">寫文章</a></li>
-          <li><a href="/profile" class="btn btn-outline"><%= user.username %></a></li>
-          <li><a href="/logout" class="btn btn-danger">登出</a></li>
-        <% } else { %>
-          <li><a href="/">首頁</a></li>
-          <li><a href="/login" class="btn btn-outline">登入</a></li>
-          <li><a href="/register" class="btn">註冊</a></li>
-        <% } %>
-      </ul>
-    </nav>
-  </header>
-  <main class="post-detail">
-    <article>
-      <div class="post-header">
-        <h1><%= post.title %></h1>
-        <p class="meta">
-          <span>👤 作者: <%= post.author %></span>
-          <span>📅 發布時間: <%= new Date(post.created_at).toLocaleString('zh-TW') %></span>
-          <% if (post.updated_at !== post.created_at) { %>
-            <span>✏️ 更新時間: <%= new Date(post.updated_at).toLocaleString('zh-TW') %></span>
+    <div class="header-content">
+      <h1><a href="/">我的部落格</a></h1>
+      <form class="search-bar" action="/search" method="GET">
+        <input type="text" name="q" placeholder="搜尋文章...">
+        <button type="submit">🔍</button>
+      </form>
+      <nav>
+        <ul>
+          <% if (user) { %>
+            <li><a href="/new" class="btn">寫文章</a></li>
+            <li>
+              <div class="user-info">
+                <div class="user-avatar"><%= user.username.charAt(0).toUpperCase() %></div>
+              </div>
+            </li>
+            <li><a href="/profile" class="btn btn-outline"><%= user.username %></a></li>
+            <li><a href="/logout" class="btn btn-danger">登出</a></li>
+          <% } else { %>
+            <li><a href="/login" class="btn btn-outline">登入</a></li>
+            <li><a href="/register" class="btn">註冊</a></li>
           <% } %>
-        </p>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h3>📂 文章分類</h3>
+        <ul class="category-list">
+          <li><a href="/">全部文章</a></li>
+          <li><a href="/category/<%= encodeURIComponent('感情') %>">💕 感情</a></li>
+          <li><a href="/category/<%= encodeURIComponent('事業') %>">💼 事業</a></li>
+          <li><a href="/category/<%= encodeURIComponent('學習') %>">📚 學習</a></li>
+          <li><a href="/category/<%= encodeURIComponent('生活') %>">🌿 生活</a></li>
+          <li><a href="/category/<%= encodeURIComponent('興趣') %>">🎯 興趣</a></li>
+          <li><a href="/category/<%= encodeURIComponent('健康') %>">🏥 健康</a></li>
+          <li><a href="/category/<%= encodeURIComponent('理財') %>">💰 理財</a></li>
+        </ul>
       </div>
-      <div class="content"><%= post.content %></div>
-      <% if (user && user.username === post.author) { %>
-        <div class="actions">
-          <a href="/edit/<%= post.id %>" class="btn btn-secondary">✏️ 編輯文章</a>
-          <form action="/delete/<%= post.id %>" method="POST" onsubmit="return confirm('確定要刪除嗎？')">
-            <button type="submit" class="btn btn-danger">🗑️ 刪除文章</button>
-          </form>
+    </aside>
+
+    <main class="main-content">
+      <article style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06);">
+        <div class="post-header">
+          <h1><%= post.title %></h1>
+          <p class="meta">
+            <span>👤 作者: <a href="/user/<%= encodeURIComponent(post.author) %>"><%= post.author %></a></span>
+            <span>📅 發布時間: <%= new Date(post.created_at).toLocaleString('zh-TW') %></span>
+            <% if (post.updated_at !== post.created_at) { %>
+              <span>✏️ 更新時間: <%= new Date(post.updated_at).toLocaleString('zh-TW') %></span>
+            <% } %>
+          </p>
         </div>
-      <% } %>
-    </article>
-  </main>
+        <div class="content"><%= post.content %></div>
+        <% if (user && user.username === post.author) { %>
+          <div class="actions">
+            <a href="/edit/<%= post.id %>" class="btn btn-secondary">✏️ 編輯文章</a>
+            <form action="/delete/<%= post.id %>" method="POST" onsubmit="return confirm('確定要刪除嗎？')">
+              <button type="submit" class="btn btn-danger">🗑️ 刪除文章</button>
+            </form>
+          </div>
+        <% } %>
+      </article>
+    </main>
+  </div>
+
   <footer>
     <p>&copy; <%= currentYear %> 我的部落格. All rights reserved.</p>
   </footer>

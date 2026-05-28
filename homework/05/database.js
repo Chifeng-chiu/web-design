@@ -171,6 +171,21 @@ function getUserById(id) {
   return null;
 }
 
+function getUserByUsername(username) {
+  const stmt = db.prepare('SELECT id, username, email, created_at FROM users WHERE username = ?');
+  stmt.bind([username]);
+  if (stmt.step()) {
+    const columns = stmt.getColumnNames();
+    const values = stmt.get();
+    const user = {};
+    columns.forEach((col, i) => user[col] = values[i]);
+    stmt.free();
+    return user;
+  }
+  stmt.free();
+  return null;
+}
+
 function getUserPosts(userId) {
   const result = db.exec(`SELECT * FROM posts WHERE user_id = ${userId} ORDER BY created_at DESC`);
   if (result.length === 0) return [];
@@ -223,6 +238,7 @@ module.exports = {
   createUser,
   verifyUser,
   getUserById,
+  getUserByUsername,
   getUserPosts,
   getPostsByCategory,
   searchPosts

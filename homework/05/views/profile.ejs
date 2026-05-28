@@ -3,71 +3,112 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>個人資料 - 我的部落格</title>
+  <title><%= profileUser.username %>的個人主頁 - 我的部落格</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <header>
-    <nav>
-      <h1>我的部落格</h1>
-      <ul>
-        <li><a href="/">首頁</a></li>
-        <li><a href="/new" class="btn">寫文章</a></li>
-        <li>
-          <div class="user-info">
-            <div class="user-avatar"><%= user.username.charAt(0).toUpperCase() %></div>
-            <span class="user-name"><%= user.username %></span>
-          </div>
-        </li>
-        <li><a href="/logout" class="btn btn-danger">登出</a></li>
-      </ul>
-    </nav>
-  </header>
-  <main>
-    <div class="hero">
-      <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2rem; margin: 0 auto 1rem;">
-        <%= user.username.charAt(0).toUpperCase() %>
-      </div>
-      <h2><%= user.username %></h2>
-      <p class="subtitle"><%= user.email %></p>
-      <p class="meta" style="justify-content: center; margin-top: 0.5rem;">
-        <span>📅 加入時間：<%= new Date(user.created_at).toLocaleDateString('zh-TW') %></span>
-      </p>
+    <div class="header-content">
+      <h1><a href="/">我的部落格</a></h1>
+      <form class="search-bar" action="/search" method="GET">
+        <input type="text" name="q" placeholder="搜尋文章..." value="<%= typeof q !== 'undefined' ? q : '' %>">
+        <button type="submit">🔍</button>
+      </form>
+      <nav>
+        <ul>
+          <% if (user) { %>
+            <li><a href="/new" class="btn">寫文章</a></li>
+            <li>
+              <div class="user-info">
+                <div class="user-avatar"><%= user.username.charAt(0).toUpperCase() %></div>
+              </div>
+            </li>
+            <li><a href="/profile" class="btn btn-outline"><%= user.username %></a></li>
+            <li><a href="/logout" class="btn btn-danger">登出</a></li>
+          <% } else { %>
+            <li><a href="/login" class="btn btn-outline">登入</a></li>
+            <li><a href="/register" class="btn">註冊</a></li>
+          <% } %>
+        </ul>
+      </nav>
     </div>
-    
-    <h2 style="margin-bottom: 1.5rem;">我的文章</h2>
-    
-    <% if (posts.length === 0) { %>
-      <div class="empty">
-        <div class="empty-icon">📝</div>
-        <h3>還沒有發表過文章</h3>
-        <p>開始分享您的想法吧！</p>
-        <a href="/new" class="btn btn-primary" style="margin-top: 1rem;">寫第一篇文章</a>
+  </header>
+
+  <div class="container">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h3>📂 文章分類</h3>
+        <ul class="category-list">
+          <li><a href="/" class="<%= !currentCategory ? 'active' : '' %>">全部文章</a></li>
+          <li><a href="/category/<%= encodeURIComponent('感情') %>" class="<%= currentCategory === '感情' ? 'active' : '' %>">💕 感情</a></li>
+          <li><a href="/category/<%= encodeURIComponent('事業') %>" class="<%= currentCategory === '事業' ? 'active' : '' %>">💼 事業</a></li>
+          <li><a href="/category/<%= encodeURIComponent('學習') %>" class="<%= currentCategory === '學習' ? 'active' : '' %>">📚 學習</a></li>
+          <li><a href="/category/<%= encodeURIComponent('生活') %>" class="<%= currentCategory === '生活' ? 'active' : '' %>">🌿 生活</a></li>
+          <li><a href="/category/<%= encodeURIComponent('興趣') %>" class="<%= currentCategory === '興趣' ? 'active' : '' %>">🎯 興趣</a></li>
+          <li><a href="/category/<%= encodeURIComponent('健康') %>" class="<%= currentCategory === '健康' ? 'active' : '' %>">🏥 健康</a></li>
+          <li><a href="/category/<%= encodeURIComponent('理財') %>" class="<%= currentCategory === '理財' ? 'active' : '' %>">💰 理財</a></li>
+        </ul>
       </div>
-    <% } else { %>
-      <div class="posts-grid">
-        <% posts.forEach(post => { %>
-          <article class="post-card">
-            <div class="post-card-header">
-              <h3><a href="/post/<%= post.id %>"><%= post.title %></a></h3>
-              <p class="meta">
-                <span>📅 <%= new Date(post.created_at).toLocaleDateString('zh-TW') %></span>
-                <% if (post.updated_at !== post.created_at) { %>
-                  <span>✏️ 已更新</span>
+    </aside>
+
+    <main class="main-content">
+      <div class="profile-header">
+        <div class="profile-avatar"><%= profileUser.username.charAt(0).toUpperCase() %></div>
+        <h2><%= profileUser.username %>的個人主頁</h2>
+        <p class="subtitle"><%= profileUser.email %></p>
+        <p class="meta" style="justify-content: center; margin-top: 0.5rem;">
+          <span>📅 加入時間：<%= new Date(profileUser.created_at).toLocaleDateString('zh-TW') %></span>
+          <span>📝 <%= posts.length %> 篇文章</span>
+        </p>
+      </div>
+
+      <h2 style="margin-bottom: 1.5rem;">
+        <%= isOwnProfile ? '我的文章' : profileUser.username + '的文章' %>
+      </h2>
+
+      <% if (posts.length === 0) { %>
+        <div class="empty">
+          <div class="empty-icon">📝</div>
+          <h3>還沒有發表過文章</h3>
+          <% if (isOwnProfile) { %>
+            <p>開始分享您的想法吧！</p>
+            <a href="/new" class="btn btn-primary" style="margin-top: 1rem;">寫第一篇文章</a>
+          <% } %>
+        </div>
+      <% } else { %>
+        <div class="posts-grid">
+          <% posts.forEach(post => { %>
+            <article class="post-card">
+              <% if (post.category) { %>
+                <span class="category-tag"><%= post.category %></span>
+              <% } %>
+              <div class="post-card-header">
+                <h3><a href="/post/<%= post.id %>"><%= post.title %></a></h3>
+                <p class="meta">
+                  <span>📅 <%= new Date(post.created_at).toLocaleDateString('zh-TW') %></span>
+                  <% if (post.updated_at !== post.created_at) { %>
+                    <span>✏️ 已更新</span>
+                  <% } %>
+                </p>
+              </div>
+              <div class="post-card-body">
+                <p class="excerpt"><%= post.content.substring(0, 120) %>...</p>
+              </div>
+              <div class="post-card-footer">
+                <a href="/post/<%= post.id %>" class="read-more">閱讀更多 →</a>
+                <% if (isOwnProfile) { %>
+                  <a href="/edit/<%= post.id %>" class="btn btn-sm btn-secondary">編輯</a>
                 <% } %>
-              </p>
-            </div>
-            <div class="post-card-body">
-              <p class="excerpt"><%= post.content.substring(0, 120) %>...</p>
-            </div>
-            <div class="post-card-footer">
-              <a href="/post/<%= post.id %>" class="read-more">閱讀更多 →</a>
-              <a href="/edit/<%= post.id %>" class="btn btn-sm btn-secondary">編輯</a>
-            </div>
-          </article>
-        <% }) %>
-      </div>
-    <% } %>
-  </main>
+              </div>
+            </article>
+          <% }) %>
+        </div>
+      <% } %>
+    </main>
+  </div>
+
+  <footer>
+    <p>&copy; <%= currentYear %> 我的部落格. All rights reserved.</p>
+  </footer>
 </body>
 </html>

@@ -2,3 +2,5 @@ __pycache__/
 *.pyc
 stock_forum.db
 .env
+node_modules/
+blog.db

@@ -8,27 +8,55 @@
 </head>
 <body>
   <header>
-    <nav>
-      <h1>我的部落格</h1>
-      <ul>
-        <li><a href="/">首頁</a></li>
-        <li><a href="/profile" class="btn btn-outline"><%= user.username %></a></li>
-        <li><a href="/logout" class="btn btn-danger">登出</a></li>
-      </ul>
-    </nav>
+    <div class="header-content">
+      <h1><a href="/">我的部落格</a></h1>
+      <form class="search-bar" action="/search" method="GET">
+        <input type="text" name="q" placeholder="搜尋文章...">
+        <button type="submit">🔍</button>
+      </form>
+      <nav>
+        <ul>
+          <li><a href="/" class="btn btn-outline">首頁</a></li>
+          <li>
+            <div class="user-info">
+              <div class="user-avatar"><%= user.username.charAt(0).toUpperCase() %></div>
+            </div>
+          </li>
+          <li><a href="/profile" class="btn btn-outline"><%= user.username %></a></li>
+          <li><a href="/logout" class="btn btn-danger">登出</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
-  <main>
-    <div class="form-wrapper">
-      <div class="form-card">
+
+  <div class="container">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h3>📂 文章分類</h3>
+        <ul class="category-list">
+          <li><a href="/">全部文章</a></li>
+          <li><a href="/category/<%= encodeURIComponent('感情') %>">💕 感情</a></li>
+          <li><a href="/category/<%= encodeURIComponent('事業') %>">💼 事業</a></li>
+          <li><a href="/category/<%= encodeURIComponent('學習') %>">📚 學習</a></li>
+          <li><a href="/category/<%= encodeURIComponent('生活') %>">🌿 生活</a></li>
+          <li><a href="/category/<%= encodeURIComponent('興趣') %>">🎯 興趣</a></li>
+          <li><a href="/category/<%= encodeURIComponent('健康') %>">🏥 健康</a></li>
+          <li><a href="/category/<%= encodeURIComponent('理財') %>">💰 理財</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="form-card" style="max-width: 100%;">
         <h2>寫新文章</h2>
         <p class="subtitle">分享您的想法</p>
-        
+
         <form action="/posts" method="POST">
           <div class="form-group">
             <label for="title">標題</label>
             <input type="text" id="title" name="title" placeholder="輸入文章標題" required>
           </div>
-          
+
           <div class="form-group">
             <label for="category">分類</label>
             <select id="category" name="category" required>
@@ -41,19 +69,23 @@
               <option value="理財">💰 理財</option>
             </select>
           </div>
-          
+
           <div class="form-group">
             <label for="content">內容</label>
             <textarea id="content" name="content" rows="12" placeholder="寫下您的文章內容..." required></textarea>
           </div>
-          
+
           <div class="form-actions">
             <button type="submit" class="btn btn-success btn-block">發布文章</button>
             <a href="/" class="btn btn-secondary">取消</a>
           </div>
         </form>
       </div>
-    </div>
-  </main>
+    </main>
+  </div>
+
+  <footer>
+    <p>&copy; <%= currentYear %> 我的部落格. All rights reserved.</p>
+  </footer>
 </body>
 </html>

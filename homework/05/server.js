@@ -2,7 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const fs = require('fs');
-const { initDatabase, getAllPosts, getPostById, createPost, updatePost, deletePost, createUser, verifyUser, getUserById, getPostsByCategory, searchPosts } = require('./database');
+const { initDatabase, getAllPosts, getPostById, createPost, updatePost, deletePost, createUser, verifyUser, getUserById, getUserByUsername, getPostsByCategory, searchPosts } = require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -312,15 +312,33 @@ app.get('/logout', (req, res) => {
   res.redirect('/');
 });
 
+app.get('/user/:username', async (req, res) => {
+  console.log('[Route] GET /user/:username - 開始', req.params.username);
+  try {
+    await ensureDbInit();
+    const { getUserPosts } = require('./database');
+    const profileUser = getUserByUsername(req.params.username);
+    if (!profileUser) {
+      return res.status(404).send('User not found');
+    }
+    const posts = getUserPosts(profileUser.id);
+    console.log('[Route] GET /user/:username - 找到', posts.length, '篇文章');
+    res.render('profile', { user: res.locals.user, profileUser, posts, isOwnProfile: false, currentCategory: null, q: null });
+  } catch (err) {
+    console.error('[Route] GET /user/:username - 錯誤:', err);
+    res.status(500).send('Server Error');
+  }
+});
+
 app.get('/profile', requireAuth, async (req, res) => {
   console.log('[Route] GET /profile - 開始');
   try {
     await ensureDbInit();
     const { getUserPosts } = require('./database');
     const posts = getUserPosts(req.session.user.id);
-    const user = getUserById(req.session.user.id);
+    const profileUser = getUserById(req.session.user.id);
     console.log('[Route] GET /profile - 找到', posts.length, '篇文章');
-    res.render('profile', { user, posts });
+    res.render('profile', { user: res.locals.user, profileUser, posts, isOwnProfile: true, currentCategory: null, q: null });
   } catch (err) {
     console.error('[Route] GET /profile - 錯誤:', err);
     res.status(500).send('Server Error');

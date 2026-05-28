@@ -90,7 +90,7 @@
               <div class="post-card-header">
                 <h3><a href="/post/<%= post.id %>"><%= post.title %></a></h3>
                 <p class="meta">
-                  <span>👤 <%= post.author %></span>
+                  <span>👤 <a href="/user/<%= encodeURIComponent(post.author) %>"><%= post.author %></a></span>
                   <span>📅 <%= new Date(post.created_at).toLocaleDateString('zh-TW') %></span>
                 </p>
               </div>
