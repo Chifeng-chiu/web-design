@@ -1,231 +1,142 @@
-const initSqlJs = require('sql.js');
-const fs = require('fs');
-const path = require('path');
 const bcrypt = require('bcryptjs');
 
-const dbPath = path.join(__dirname, 'blog.db');
-
-console.log('[Database] 資料庫路徑:', dbPath);
-
-let db;
+// 直接用 JavaScript 陣列當作記憶體資料庫
+let users = [];
+let posts = [];
+let userIdCounter = 1;
+let postIdCounter = 1;
 
 async function initDatabase() {
-  console.log('[Database] 開始初始化...');
-  try {
-    const SQL = await initSqlJs();
-    console.log('[Database] sql.js 載入成功');
-    
-    if (fs.existsSync(dbPath)) {
-      console.log('[Database] 發現現有資料庫:', dbPath);
-      const buffer = fs.readFileSync(dbPath);
-      console.log('[Database] 資料庫大小:', buffer.length, 'bytes');
-      db = new SQL.Database(buffer);
-    } else {
-      console.log('[Database] 建立新資料庫');
-      db = new SQL.Database();
-    }
-    
-    console.log('[Database] 建立 users 資料表...');
-    db.run(`
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    
-    console.log('[Database] 建立 posts 資料表...');
-    db.run(`
-      CREATE TABLE IF NOT EXISTS posts (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        content TEXT NOT NULL,
-        author TEXT NOT NULL DEFAULT 'Anonymous',
-        user_id INTEGER,
-        category TEXT DEFAULT '生活',
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-      )
-    `);
+  console.log('[Database] 初始化 Vercel 相容模式 (Array Mock)...');
+  
+  // 建立一個預設帳號 admin / 密碼 123456
+  const hashedPassword = await bcrypt.hash('123456', 10);
+  users = [{
+    id: userIdCounter++,
+    username: 'admin',
+    email: 'admin@test.com',
+    password: hashedPassword,
+    created_at: new Date().toISOString()
+  }];
 
-    console.log('[Database] 儲存資料庫...');
-    saveDatabase();
-    console.log('[Database] 初始化完成');
-    return db;
-  } catch (err) {
-    console.error('[Database] 初始化錯誤:', err);
-    throw err;
-  }
-}
+  // 建立一篇預設文章
+  posts = [{
+    id: postIdCounter++,
+    title: '歡迎來到我的部落格',
+    content: '這是一個為了 Vercel 環境特製的陣列資料庫！完全避開了 SQLite 的非同步與唯讀問題。現在網頁應該能光速載入，發文功能也能正常使用了喔！',
+    author: '系統管理員',
+    user_id: 1,
+    category: '生活',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }];
 
-function saveDatabase() {
-  const data = db.export();
-  const buffer = Buffer.from(data);
-  fs.writeFileSync(dbPath, buffer);
+  console.log('[Database] 初始化完成');
+  return true;
 }
 
 function getAllPosts() {
-  const result = db.exec('SELECT * FROM posts ORDER BY created_at DESC');
-  if (result.length === 0) return [];
-  const columns = result[0].columns;
-  return result[0].values.map(row => {
-    const obj = {};
-    columns.forEach((col, i) => obj[col] = row[i]);
-    return obj;
-  });
+  // 回傳所有文章，並依照時間由新到舊排序
+  return [...posts].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 }
 
 function getPostById(id) {
-  const stmt = db.prepare('SELECT * FROM posts WHERE id = ?');
-  stmt.bind([id]);
-  if (stmt.step()) {
-    const columns = stmt.getColumnNames();
-    const values = stmt.get();
-    const obj = {};
-    columns.forEach((col, i) => obj[col] = values[i]);
-    stmt.free();
-    return obj;
-  }
-  stmt.free();
-  return null;
+  // 注意：從網址傳來的 id 可能是字串，所以要用 Number() 轉型
+  return posts.find(p => p.id === Number(id)) || null;
 }
 
 function createPost(title, content, author, userId = null, category = '生活') {
   const now = new Date().toISOString();
-  db.run('INSERT INTO posts (title, content, author, user_id, category, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)', 
-    [title, content, author || 'Anonymous', userId, category, now, now]);
-  saveDatabase();
-  const result = db.exec('SELECT last_insert_rowid() as id');
-  return result[0].values[0][0];
+  const newPost = {
+    id: postIdCounter++,
+    title,
+    content,
+    author: author || 'Anonymous',
+    user_id: userId ? Number(userId) : null,
+    category,
+    created_at: now,
+    updated_at: now
+  };
+  posts.push(newPost);
+  return newPost.id;
 }
 
 function updatePost(id, title, content, author) {
-  const now = new Date().toISOString();
-  db.run('UPDATE posts SET title = ?, content = ?, author = ?, updated_at = ? WHERE id = ?',
-    [title, content, author, now, id]);
-  saveDatabase();
-}
-
-function deletePost(id) {
-  db.run('DELETE FROM posts WHERE id = ?', [id]);
-  saveDatabase();
-}
-
-async function createUser(username, email, password) {
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const now = new Date().toISOString();
-  try {
-    db.run('INSERT INTO users (username, email, password, created_at) VALUES (?, ?, ?, ?)',
-      [username, email, hashedPassword, now]);
-    saveDatabase();
-    const result = db.exec('SELECT last_insert_rowid() as id');
-    return { id: result[0].values[0][0], username, email };
-  } catch (err) {
-    if (err.message.includes('UNIQUE constraint')) {
-      if (err.message.includes('username')) {
-        throw new Error('Username already exists');
-      }
-      if (err.message.includes('email')) {
-        throw new Error('Email already exists');
-      }
-    }
-    throw err;
+  const post = posts.find(p => p.id === Number(id));
+  if (post) {
+    post.title = title;
+    post.content = content;
+    post.author = author;
+    post.updated_at = new Date().toISOString();
   }
 }
 
-async function verifyUser(username, password) {
-  const stmt = db.prepare('SELECT * FROM users WHERE username = ? OR email = ?');
-  stmt.bind([username, username]);
+function deletePost(id) {
+  posts = posts.filter(p => p.id !== Number(id));
+}
+
+async function createUser(username, email, password) {
+  // 檢查帳號或信箱是否重複
+  if (users.some(u => u.username === username)) throw new Error('Username already exists');
+  if (users.some(u => u.email === email)) throw new Error('Email already exists');
   
-  if (stmt.step()) {
-    const columns = stmt.getColumnNames();
-    const values = stmt.get();
-    const user = {};
-    columns.forEach((col, i) => user[col] = values[i]);
-    stmt.free();
-    
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const now = new Date().toISOString();
+  const newUser = {
+    id: userIdCounter++,
+    username,
+    email,
+    password: hashedPassword,
+    created_at: now
+  };
+  
+  users.push(newUser);
+  return { id: newUser.id, username, email };
+}
+
+async function verifyUser(username, password) {
+  const user = users.find(u => u.username === username || u.email === username);
+  if (user) {
     const isValid = await bcrypt.compare(password, user.password);
     if (isValid) {
       return { id: user.id, username: user.username, email: user.email };
     }
   }
-  stmt.free();
   return null;
 }
 
 function getUserById(id) {
-  const stmt = db.prepare('SELECT id, username, email, created_at FROM users WHERE id = ?');
-  stmt.bind([id]);
-  if (stmt.step()) {
-    const columns = stmt.getColumnNames();
-    const values = stmt.get();
-    const user = {};
-    columns.forEach((col, i) => user[col] = values[i]);
-    stmt.free();
-    return user;
+  const user = users.find(u => u.id === Number(id));
+  if (user) {
+    return { id: user.id, username: user.username, email: user.email, created_at: user.created_at };
   }
-  stmt.free();
   return null;
 }
 
 function getUserByUsername(username) {
-  const stmt = db.prepare('SELECT id, username, email, created_at FROM users WHERE username = ?');
-  stmt.bind([username]);
-  if (stmt.step()) {
-    const columns = stmt.getColumnNames();
-    const values = stmt.get();
-    const user = {};
-    columns.forEach((col, i) => user[col] = values[i]);
-    stmt.free();
-    return user;
+  const user = users.find(u => u.username === username);
+  if (user) {
+    return { id: user.id, username: user.username, email: user.email, created_at: user.created_at };
   }
-  stmt.free();
   return null;
 }
 
 function getUserPosts(userId) {
-  const result = db.exec(`SELECT * FROM posts WHERE user_id = ${userId} ORDER BY created_at DESC`);
-  if (result.length === 0) return [];
-  const columns = result[0].columns;
-  return result[0].values.map(row => {
-    const obj = {};
-    columns.forEach((col, i) => obj[col] = row[i]);
-    return obj;
-  });
+  return posts.filter(p => p.user_id === Number(userId))
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 }
 
 function getPostsByCategory(category) {
-  const stmt = db.prepare('SELECT * FROM posts WHERE category = ? ORDER BY created_at DESC');
-  stmt.bind([category]);
-  const results = [];
-  while (stmt.step()) {
-    const columns = stmt.getColumnNames();
-    const values = stmt.get();
-    const obj = {};
-    columns.forEach((col, i) => obj[col] = values[i]);
-    results.push(obj);
-  }
-  stmt.free();
-  return results;
+  return posts.filter(p => p.category === category)
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 }
 
 function searchPosts(keyword) {
-  const stmt = db.prepare('SELECT * FROM posts WHERE title LIKE ? OR content LIKE ? ORDER BY created_at DESC');
-  const searchTerm = `%${keyword}%`;
-  stmt.bind([searchTerm, searchTerm]);
-  const results = [];
-  while (stmt.step()) {
-    const columns = stmt.getColumnNames();
-    const values = stmt.get();
-    const obj = {};
-    columns.forEach((col, i) => obj[col] = values[i]);
-    results.push(obj);
-  }
-  stmt.free();
-  return results;
+  const lowerKeyword = keyword.toLowerCase();
+  return posts.filter(p => 
+                p.title.toLowerCase().includes(lowerKeyword) || 
+                p.content.toLowerCase().includes(lowerKeyword)
+              ).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 }
 
 module.exports = {
