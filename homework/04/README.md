@@ -251,3 +251,6 @@ const students = [
 ## 使用方式
 
 直接在瀏覽器中開啟 `js-learning.html`，每個練習獨立操作，無需任何依賴。
+
+## 與AI的聊天紀錄
+https://gemini.google.com/share/63ef656112f2
